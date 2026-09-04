@@ -1,0 +1,9 @@
+---
+title: "Lab 1: FPGA and MCU Setup and Testing"
+description: ""
+author: "Enzo Katzen"
+date: "9/4/26"
+categories:
+    - Lab Report
+draft: false
+---

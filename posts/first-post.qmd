@@ -1,0 +1,11 @@
+---
+title: "Hello Quarto"
+description: "Welcome to my Quarto portfolio"
+author: "Enzo Katzen"
+date: "9/4/26"
+categories:
+  - reflection
+draft: false
+---
+
+In E155 I hope to more comfortable with desigining microprocessors for various tasks and integrating them into larger systems that include microcontrollers. I also hope to become better at designing and implementing digital circuits and systems.

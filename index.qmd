@@ -1,0 +1,18 @@
+---
+title: "E155 Portfolio"
+image: images/headshot.jpeg
+about:
+    template: jolla
+    links:
+        - icon: github
+          text: GitHub
+          href: https://github.com/enzokatzen
+        - icon: linkedin
+          text: LinkedIn
+          href: https://linkedin.com/in/enzokatzen
+---
+
+Enzo Katzen is a Mathematical and Computational Biology joint major at [Harvey Mudd College](https://hmc.edu). 
+Prior to studying at Harvey Mudd, he went to Brooklyn Technical High School in New York City. 
+He is primarily interested in the field of biology, with a particular focus on developmental biology and the burgeoning field of biocomputing. 
+He also has a strong interest in low-level programming and computer engineering, which he has explored through various projects and coursework.
