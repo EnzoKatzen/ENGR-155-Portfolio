@@ -32,26 +32,26 @@ The seven segment display was implemented using an always_comb case block that u
 
 ::: {.callout-note title="Seven Segment always_comb Block" collapse="true"}
 ```text
-always_comb
+always_comb 
 begin
     case(bitsIn)
-        4'h0: LEDSeg = ~(7'b0111111);
-        4'h1: LEDSeg = ~(7'b0000110);
-        4'h2: LEDSeg = ~(7'b1011011);
-        4'h3: LEDSeg = ~(7'b1001111);
-        4'h4: LEDSeg = ~(7'b1100110);
-        4'h5: LEDSeg = ~(7'b1101101);
-        4'h6: LEDSeg = ~(7'b1111101);
-        4'h7: LEDSeg = ~(7'b0000111);
-        4'h8: LEDSeg = ~(7'b1111111);
-        4'h9: LEDSeg = ~(7'b1101111);
-        4'hA: LEDSeg = ~(7'b1110111);
-        4'hB: LEDSeg = ~(7'b1111100);
-        4'hC: LEDSeg = ~(7'b0111001);
-        4'hD: LEDSeg = ~(7'b1011110);
-        4'hE: LEDSeg = ~(7'b1111001);
-        4'hF: LEDSeg = ~(7'b1110001);
-        default: LEDSeg = ~(7'b0000000);
+        4'h0: diodeSeg = ~(7'b0111111);
+        4'h1: diodeSeg = ~(7'b0000110);
+        4'h2: diodeSeg = ~(7'b1011011);
+        4'h3: diodeSeg = ~(7'b1001111);
+        4'h4: diodeSeg = ~(7'b1100110);
+        4'h5: diodeSeg = ~(7'b1101101);
+        4'h6: diodeSeg = ~(7'b1111101);
+        4'h7: diodeSeg = ~(7'b0000111);
+        4'h8: diodeSeg = ~(7'b1111111);
+        4'h9: diodeSeg = ~(7'b1101111);
+        4'hA: diodeSeg = ~(7'b1110111);
+        4'hB: diodeSeg = ~(7'b1111100);
+        4'hC: diodeSeg = ~(7'b0111001);
+        4'hD: diodeSeg = ~(7'b1011110);
+        4'hE: diodeSeg = ~(7'b1111001);
+        4'hF: diodeSeg = ~(7'b1110001);
+        default: diodeSeg = ~(7'b0000000);
     endcase
 end
 ```
@@ -66,7 +66,7 @@ The source code for the project can be found in the associated [Github repositor
 ### Block Diagram
 
 ::: {#fig-block-diagram}
-![](images/Block.jpeg)
+![](images/Final-Block.jpeg)
 
 Block diagram of the Verilog design.
 :::
@@ -77,14 +77,13 @@ The top-level module `lab1_EK` includes three submodules: the high-speed oscilla
 ### Schematic
 
 ::: {#fig-schematic}
-![](images/Schematic.jpeg)
+![](images/Final-Schematic.jpeg)
 
 Schematic of the physical circuit.
 :::
 
 @fig-schematic shows the physical layout of the design.
-Internal 100 k$\Omega$ pullup resistors were used on all inputs to ensure the pins would not be floating.
-The on board LEDs were connected using a 1 k$\Omega$ current-limiting resistor to ensure the output current (~2.6 mA) did not exceed the maximum output current of the FPGA I/O pins. The seven segment displays were connected using a 150 $\Omega$ current limiting resistor to ensure the output current matches their specifications. A resistor was needed for each segment to maintain even current (and brightness) across all segments. The maximum current draw from the seven segment display was 140 mA, which is below the maximum current draw of 200 mA for the FPGA supply pins. The resistor values are derived in @fig-calculations.
+Internal 100 k$\Omega$ pullup resistors were used on all inputs to ensure the pins would not be floating. The on board LEDs were connected using a 1 k$\Omega$ current-limiting resistor to ensure the output current (~2.6 mA) did not exceed the maximum output current of the FPGA I/O pins. The seven segment displays were driven at 3.3V so the reverse voltage from the FPGA I/O pins would match. The seven segment displays were connected using a 150 $\Omega$ current limiting resistor to ensure the output current does not exceed the maximum drain current of the FPGA I/O pins. A resistor was needed for each segment to maintain even current (and brightness) across all segments. The resistor values are derived in @fig-calculations.
 
 ## Results and Discussion
 
@@ -92,23 +91,17 @@ This design was able to achieve all tasks. In both simulation and on the physica
 
 ### Testbench Simulation
 
-@fig-testbench shows the results of the QuestaSim simulation, and @fig-fullTestbench shows the top-level test of the blinking LED over its full time scale.
+To keep the waveforms legible, the automatic test benches were split into seperate test benches for each submodule and their respective top-level connections. The results of the test benches are shown below.
 
-::: {#fig-testbench}
-![](images/zoomed.png)
+:::: {.callout-note title="Top Level Testbench Simulation of Combinational LEDs and Clk" collapse="true"}
+::: {#fig-topLevelTestbench}
+![](images/top-level-testing.png)
 
-A screenshot of a QuestaSim simulation showing the combinational LEDs and the seven segment display functioning as intended both when tested as submodules and when tested as part of the top-level module. The blinking LED was tested as a submodule and worked properly, but its test as part of the top-level was over a much longer time scale and is shown in the hidden screenshot below.
-:::
-
-:::: {.callout-note title="Top Level Testbench Simulation of Blinking LED" collapse="true"}
-::: {#fig-fullTestbench}
-![](images/full.png)
-
-A screenshot of a QuestaSim simulation showing the blinking LED functioning as intended when tested as part of the top-level module.
+A screenshot of a QuestaSim simulation showing the combinational LEDs and the clk in the top level module functioning as intended.
 :::
 ::::
 
-::: {.callout-note title="Testbench Test Results" collapse="true"}
+::: {.callout-note title="Top Level Combinational LEDs and Clk Results" collapse="true"}
 ```text
 # PASSED! The HSOSC generated clk behaves as desired at time: 42000.
 # PASSED! The HSOSC generated clk behaves as desired at time: 63000.
@@ -122,33 +115,101 @@ A screenshot of a QuestaSim simulation showing the blinking LED functioning as i
 # PASSED! The led controller behaves as desired at time: 417000.
 # PASSED! The led controller behaves as desired at time: 458000.
 # PASSED! The led controller behaves as desired at time: 500000.
-# PASSED! The seven segment display controller behaves as desired at time: 542000.
-# PASSED! The seven segment display controller behaves as desired at time: 583000.
-# PASSED! The seven segment display controller behaves as desired at time: 625000.
-# PASSED! The seven segment display controller behaves as desired at time: 667000.
-# PASSED! The seven segment display controller behaves as desired at time: 708000.
-# PASSED! The seven segment display controller behaves as desired at time: 750000.
-# PASSED! The seven segment display controller behaves as desired at time: 792000.
-# PASSED! The seven segment display controller behaves as desired at time: 833000.
-# PASSED! The seven segment display controller behaves as desired at time: 875000.
-# PASSED! The seven segment display controller behaves as desired at time: 917000.
-# PASSED! The seven segment display controller behaves as desired at time: 958000.
-# PASSED! The seven segment display controller behaves as desired at time: 1000000.
-# PASSED! The seven segment display controller behaves as desired at time: 1042000.
-# PASSED! The seven segment display controller behaves as desired at time: 1083000.
-# PASSED! The seven segment display controller behaves as desired at time: 1125000.
-# PASSED! The seven segment display controller behaves as desired at time: 1167000.
-# PASSED! The seven segment submodule connection behaves as desired at time: 1208000.
-# PASSED! The seven segment submodule connection behaves as desired at time: 1250000.
-# PASSED! The counter submodule behaves as desired at time: 1260000.
-# PASSED! The counter submodule behaves as desired at time: 1330000.
-# PASSED! The counter submodule behaves as desired at time: 1410000.
-# PASSED! The counter submodule behaves as desired at time: 1510000.
-# PASSED! The counter submodule behaves as desired at time: 1580000.
-# PASSED! The counter submodule connection behaves as desired at time: 208334914000.
-# PASSED! The counter submodule connection behaves as desired at time: 416668248000.
 ```
 :::
+
+:::: {.callout-note title="Simulation of Blinking LED module" collapse="true"}
+::: {#fig-blinkingTestbench}
+![](images/counter-testing.png)
+
+A screenshot of a QuestaSim simulation showing the blinking LED module functioning as intended.
+:::
+::::
+
+::: {.callout-note title="Blinking LED Module Results" collapse="true"}
+```text
+# PASSED! The counter submodule behaves as desired at time: 1000.
+# PASSED! The counter submodule behaves as desired at time: 8000.
+# PASSED! The counter submodule behaves as desired at time: 16000.
+# PASSED! The counter submodule behaves as desired at time: 26000.
+# PASSED! The counter submodule behaves as desired at time: 34000.
+```
+:::
+
+:::: {.callout-note title="Simulation of Seven Segment Display module" collapse="true"}
+::: {#fig-segmentTestbench}
+![](images/segment-testing.png)
+
+A screenshot of a QuestaSim simulation showing the seven segment display module functioning as intended.
+:::
+::::
+
+::: {.callout-note title="Seven Segment Display Module Results" collapse="true"}
+```text
+# PASSED! The seven segment display controller behaves as desired at time: 4200.
+# PASSED! The seven segment display controller behaves as desired at time: 8300.
+# PASSED! The seven segment display controller behaves as desired at time: 12500.
+# PASSED! The seven segment display controller behaves as desired at time: 16700.
+# PASSED! The seven segment display controller behaves as desired at time: 20800.
+# PASSED! The seven segment display controller behaves as desired at time: 25000.
+# PASSED! The seven segment display controller behaves as desired at time: 29200.
+# PASSED! The seven segment display controller behaves as desired at time: 33300.
+# PASSED! The seven segment display controller behaves as desired at time: 37500.
+# PASSED! The seven segment display controller behaves as desired at time: 41700.
+# PASSED! The seven segment display controller behaves as desired at time: 45800.
+# PASSED! The seven segment display controller behaves as desired at time: 50000.
+# PASSED! The seven segment display controller behaves as desired at time: 54200.
+# PASSED! The seven segment display controller behaves as desired at time: 58300.
+# PASSED! The seven segment display controller behaves as desired at time: 62500.
+# PASSED! The seven segment display controller behaves as desired at time: 66700.
+```
+:::
+
+:::: {.callout-note title="Top Level Testbench Simulation of Blinking LED" collapse="true"}
+::: {#fig-counterTopTestbench}
+![](images/counter-to-top-testing.png)
+
+A screenshot of a QuestaSim simulation showing the blinking LED functioning as intended when tested as part of the top-level module.
+:::
+::::
+
+::: {.callout-note title="Top Level Blinking LED Results" collapse="true"}
+```text
+# PASSED! The counter submodule connection behaves as desired at time: 208333376000.
+# PASSED! The counter submodule connection behaves as desired at time: 416666710000.
+# PASSED! The counter submodule connection behaves as desired at time: 666666751000.
+```
+:::
+
+:::: {.callout-note title="Top Level Testbench Simulation of Seven Segment Display" collapse="true"}
+::: {#fig-segmentTopTestbench}
+![](images/segment-to-top-testing.png)
+
+A screenshot of a QuestaSim simulation showing the seven segment display functioning as intended when tested as part of the top-level module.
+:::
+::::
+
+::: {.callout-note title="Top Level Seven Segment Display Results" collapse="true"}
+```text
+# PASSED! The seven segment top module connection behaves as desired at time: 83000.
+# PASSED! The seven segment top module connection behaves as desired at time: 125000.
+# PASSED! The seven segment top module connection behaves as desired at time: 167000.
+# PASSED! The seven segment top module connection behaves as desired at time: 208000.
+# PASSED! The seven segment top module connection behaves as desired at time: 250000.
+# PASSED! The seven segment top module connection behaves as desired at time: 292000.
+# PASSED! The seven segment top module connection behaves as desired at time: 333000.
+# PASSED! The seven segment top module connection behaves as desired at time: 375000.
+# PASSED! The seven segment top module connection behaves as desired at time: 417000.
+# PASSED! The seven segment top module connection behaves as desired at time: 458000.
+# PASSED! The seven segment top module connection behaves as desired at time: 500000.
+# PASSED! The seven segment top module connection behaves as desired at time: 542000.
+# PASSED! The seven segment top module connection behaves as desired at time: 583000.
+# PASSED! The seven segment top module connection behaves as desired at time: 625000.
+# PASSED! The seven segment top module connection behaves as desired at time: 667000.
+# PASSED! The seven segment top module connection behaves as desired at time: 708000.
+```
+:::
+
 
 ## Conclusion
 
@@ -160,7 +221,7 @@ I spent a total of ten hours working on this lab, but a significant (>3 hrs) amo
 
 :::: {.callout-note title="Resistor and Counter Calculations" collapse="true"}
 ::: {#fig-calculations}
-![](images/calculations.png)
+![](images/final-calcs.jpeg)
 
 Calculations for the current-limiting resistor values and the counter maximum used to divide the 24 MHz clock down to 2.4 Hz.
 :::
