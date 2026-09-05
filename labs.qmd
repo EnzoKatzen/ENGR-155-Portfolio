@@ -1,7 +1,7 @@
 ---
 title: "E155 Labs"
 listing:
-  contents: posts
+  contents: labs
   sort: "date desc"
   type: default
   categories: false
