@@ -128,11 +128,11 @@ A screenshot of a QuestaSim simulation showing the blinking LED module functioni
 
 ::: {.callout-note title="Blinking LED Module Results" collapse="true"}
 ```text
-# PASSED! The counter submodule behaves as desired at time: 1000.
 # PASSED! The counter submodule behaves as desired at time: 8000.
 # PASSED! The counter submodule behaves as desired at time: 16000.
-# PASSED! The counter submodule behaves as desired at time: 26000.
+# PASSED! The counter submodule behaves as desired at time: 24000.
 # PASSED! The counter submodule behaves as desired at time: 34000.
+# PASSED! The counter submodule behaves as desired at time: 42000.
 ```
 :::
 
