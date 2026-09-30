@@ -1,13 +1,13 @@
 ---
-title: "Lab 1: FPGA and MCU Setup and Testing"
+title: "Lab 3: Keypad Scanner"
 description: ""
 author: "Enzo Katzen"
-date: "09/04/2026"
+date: "09/23/2026"
 categories:
     - Lab Report
 draft: false
 ---
-
+<!-- 
 ## Introduction
 
 In this lab, the microPs dev board was assembled and a design was implemented on the FPGA to perform 3 tasks. The first task was to illuminate two of the on-board LED corresponding to combinational logic based on the state of 4 on board switches. The first LED was to be illuminated based on an XOR that took in the states of switches 0 and 1. The second LED was to be illuminated based on an AND that took in the states of switches 2 and 3. The second task was to blink one of the on-board LEDs at a frequency of 2.4Hz using the on-board high-speed oscillator. The third task was to illuminate a seven segment display with a number corresponding to the state of the 4 on-board switches. The high speed oscillator was configured at a frequency of 24 MHz and divided down using a counter to achieve a blinking frequency of 2.4 Hz.
@@ -63,18 +63,6 @@ Lastly, the overall design was tested in simulation using an automated test benc
 
 The source code for the project can be found in the associated [Github repository](https://github.com/EnzoKatzen/ENGR-155-Lab-1).
 
-### Schematic
-
-::: {#fig-schematic}
-![](images/Final-Schematic.jpeg)
-
-Schematic of the physical circuit.
-:::
-
-@fig-schematic shows the physical layout of the design.
-Internal 100 k$\Omega$ pullup resistors were used on all inputs to ensure the pins would not be floating. The on board LEDs were connected using a 1 k$\Omega$ current-limiting resistor to ensure the output current (~2.6 mA) did not exceed the maximum output current of the FPGA I/O pins. The seven segment displays were driven at 3.3V so the reverse voltage from the FPGA I/O pins would match. The seven segment displays were connected using a 150 $\Omega$ current limiting resistor to ensure the output current does not exceed the maximum drain current of the FPGA I/O pins. A resistor was needed for each segment to maintain even current (and brightness) across all segments. The resistor values are derived in @fig-calculations.
-
-
 ### Block Diagram
 
 ::: {#fig-block-diagram}
@@ -85,6 +73,17 @@ Block diagram of the Verilog design.
 
 The block diagram in @fig-block-diagram demonstrates the overall architecture of the design.
 The top-level module `lab1_EK` includes three submodules: the high-speed oscillator block (`HSOSC`), the seven segment display module (`sevenSeg`), and the counter module (`clk_divider`).
+
+### Schematic
+
+::: {#fig-schematic}
+![](images/Final-Schematic.jpeg)
+
+Schematic of the physical circuit.
+:::
+
+@fig-schematic shows the physical layout of the design.
+Internal 100 k$\Omega$ pullup resistors were used on all inputs to ensure the pins would not be floating. The on board LEDs were connected using a 1 k$\Omega$ current-limiting resistor to ensure the output current (~2.6 mA) did not exceed the maximum output current of the FPGA I/O pins. The seven segment displays were driven at 3.3V so the reverse voltage from the FPGA I/O pins would match. The seven segment displays were connected using a 150 $\Omega$ current limiting resistor to ensure the output current does not exceed the maximum drain current of the FPGA I/O pins. A resistor was needed for each segment to maintain even current (and brightness) across all segments. The resistor values are derived in @fig-calculations.
 
 ## Results and Discussion
 
@@ -230,50 +229,4 @@ Calculations for the current-limiting resistor values and the counter maximum us
 
 ## AI Prototype Summary
 
-::: {.callout-note title="AI Generated Code" collapse="true"}
-```text
-module led_blink #(
-    parameter int unsigned CLK_FREQ_HZ = 48_000_000,
-    parameter int unsigned BLINK_HZ    = 2
-) (
-    output logic led
-);
-
-    // Toggle the LED every half-period.
-    localparam int unsigned HALF_PERIOD =
-        CLK_FREQ_HZ / (2 * BLINK_HZ);
-
-    // Width automatically sized for the required count.
-    localparam int unsigned COUNTER_WIDTH =
-        (HALF_PERIOD <= 1) ? 1 : $clog2(HALF_PERIOD);
-
-    logic clk;
-    logic [COUNTER_WIDTH-1:0] counter;
-
-    // Lattice iCE40 UltraPlus internal high-frequency oscillator.
-    HSOSC #(
-        .CLKHF_DIV(2'b00)       // 48 MHz
-    ) hfosc (
-        .CLKHFPU(1'b1),          // Power up oscillator
-        .CLKHFEN(1'b1),          // Enable clock output
-        .CLKHF  (clk)
-    );
-
-    // Divide 48 MHz down to a 2 Hz LED blink.
-    always_ff @(posedge clk) begin
-        if (counter == HALF_PERIOD - 1) begin
-            counter <= '0;
-            led     <= ~led;
-        end
-        else begin
-            counter <= counter + 1'b1;
-        end
-    end
-
-endmodule
-```
-:::
-
-I used the free non-signed-in version of ChatGPT to generate this code using the provided LLM prompt. Initially the code did not compile due to it assuming that I was using "Yosys/nexpnr", which lead it to use SB_HFOSC instead of HSOSC. However, after I specified that I was using Lattice Radiant, it switched it to using the correct HSOSC module. This was able to successfully synthesize and implement on the FPGA, and the LED blinked at the correct frequency.
-
-I would say that is code is of fairly decent quality. It comments well, uses descriptive variable names, and uses cohesive capitalization and formatting. However, it over defines many variables, and seems to be overcomplicated for the task at hand. It used some things that I had never seen before, such as using underscores as commas to make large numbers more readable, localparams, and the $clog2 function. If I were to use an LLM in my workflow, I would give it clear instructions of how I want it to achieve the task. This way the LLM will not overcomplicate the code and will act as a helper that can write the easy parts of the code while I focus on the more difficult parts.
+I used the free Claude to generate this code using the provided LLM prompts. Both the monolithic and the modular prompts generated clear well commented code that appeared to run without -->
