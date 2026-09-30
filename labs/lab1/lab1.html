@@ -162,8 +162,8 @@ window.Quarto = {
   <li><a href="#design-and-testing-methodology" id="toc-design-and-testing-methodology" class="nav-link" data-scroll-target="#design-and-testing-methodology">Design and Testing Methodology</a></li>
   <li><a href="#technical-documentation" id="toc-technical-documentation" class="nav-link" data-scroll-target="#technical-documentation">Technical Documentation</a>
   <ul class="collapse">
-  <li><a href="#block-diagram" id="toc-block-diagram" class="nav-link" data-scroll-target="#block-diagram">Block Diagram</a></li>
   <li><a href="#schematic" id="toc-schematic" class="nav-link" data-scroll-target="#schematic">Schematic</a></li>
+  <li><a href="#block-diagram" id="toc-block-diagram" class="nav-link" data-scroll-target="#block-diagram">Block Diagram</a></li>
   </ul></li>
   <li><a href="#results-and-discussion" id="toc-results-and-discussion" class="nav-link" data-scroll-target="#results-and-discussion">Results and Discussion</a>
   <ul class="collapse">
@@ -282,20 +282,6 @@ end</code></pre>
 <section id="technical-documentation" class="level2">
 <h2 class="anchored" data-anchor-id="technical-documentation">Technical Documentation</h2>
 <p>The source code for the project can be found in the associated <a href="https://github.com/EnzoKatzen/ENGR-155-Lab-1">Github repository</a>.</p>
-<section id="block-diagram" class="level3">
-<h3 class="anchored" data-anchor-id="block-diagram">Block Diagram</h3>
-<div id="fig-block-diagram" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-block-diagram-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/Final-Block.jpeg" class="img-fluid figure-img">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-block-diagram-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Block diagram of the Verilog design.
-</figcaption>
-</figure>
-</div>
-<p>The block diagram in <a href="#fig-block-diagram" class="quarto-xref">Figure&nbsp;1</a> demonstrates the overall architecture of the design. The top-level module <code>lab1_EK</code> includes three submodules: the high-speed oscillator block (<code>HSOSC</code>), the seven segment display module (<code>sevenSeg</code>), and the counter module (<code>clk_divider</code>).</p>
-</section>
 <section id="schematic" class="level3">
 <h3 class="anchored" data-anchor-id="schematic">Schematic</h3>
 <div id="fig-schematic" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -304,11 +290,25 @@ Figure&nbsp;1: Block diagram of the Verilog design.
 <img src="images/Final-Schematic.jpeg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-schematic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Schematic of the physical circuit.
+Figure&nbsp;1: Schematic of the physical circuit.
 </figcaption>
 </figure>
 </div>
-<p><a href="#fig-schematic" class="quarto-xref">Figure&nbsp;2</a> shows the physical layout of the design. Internal 100 k<span class="math inline">\(\Omega\)</span> pullup resistors were used on all inputs to ensure the pins would not be floating. The on board LEDs were connected using a 1 k<span class="math inline">\(\Omega\)</span> current-limiting resistor to ensure the output current (~2.6 mA) did not exceed the maximum output current of the FPGA I/O pins. The seven segment displays were driven at 3.3V so the reverse voltage from the FPGA I/O pins would match. The seven segment displays were connected using a 150 <span class="math inline">\(\Omega\)</span> current limiting resistor to ensure the output current does not exceed the maximum drain current of the FPGA I/O pins. A resistor was needed for each segment to maintain even current (and brightness) across all segments. The resistor values are derived in <a href="#fig-calculations" class="quarto-xref">Figure&nbsp;8</a>.</p>
+<p><a href="#fig-schematic" class="quarto-xref">Figure&nbsp;1</a> shows the physical layout of the design. Internal 100 k<span class="math inline">\(\Omega\)</span> pullup resistors were used on all inputs to ensure the pins would not be floating. The on board LEDs were connected using a 1 k<span class="math inline">\(\Omega\)</span> current-limiting resistor to ensure the output current (~2.6 mA) did not exceed the maximum output current of the FPGA I/O pins. The seven segment displays were driven at 3.3V so the reverse voltage from the FPGA I/O pins would match. The seven segment displays were connected using a 150 <span class="math inline">\(\Omega\)</span> current limiting resistor to ensure the output current does not exceed the maximum drain current of the FPGA I/O pins. A resistor was needed for each segment to maintain even current (and brightness) across all segments. The resistor values are derived in <a href="#fig-calculations" class="quarto-xref">Figure&nbsp;8</a>.</p>
+</section>
+<section id="block-diagram" class="level3">
+<h3 class="anchored" data-anchor-id="block-diagram">Block Diagram</h3>
+<div id="fig-block-diagram" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-block-diagram-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/Final-Block.jpeg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-block-diagram-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Block diagram of the Verilog design.
+</figcaption>
+</figure>
+</div>
+<p>The block diagram in <a href="#fig-block-diagram" class="quarto-xref">Figure&nbsp;2</a> demonstrates the overall architecture of the design. The top-level module <code>lab1_EK</code> includes three submodules: the high-speed oscillator block (<code>HSOSC</code>), the seven segment display module (<code>sevenSeg</code>), and the counter module (<code>clk_divider</code>).</p>
 </section>
 </section>
 <section id="results-and-discussion" class="level2">

@@ -11,21 +11,7 @@
     "href": "labs.html",
     "title": "E155 Labs",
     "section": "",
-    "text": "Lab 1: FPGA and MCU Setup and Testing\n\n\n\n\n\n\n\n\nSep 4, 2026\n\n\nEnzo Katzen\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "E155 Portfolio",
-    "section": "",
-    "text": "Enzo Katzen is a Mathematical and Computational Biology joint major at Harvey Mudd College. Prior to studying at Harvey Mudd, he went to Brooklyn Technical High School in New York City. He is primarily interested in the field of biology, with a particular focus on developmental biology and the burgeoning field of biocomputing. He also has a strong interest in low-level programming and computer engineering, which he has explored through various projects and coursework."
-  },
-  {
-    "objectID": "blog.html",
-    "href": "blog.html",
-    "title": "E155 Blog",
-    "section": "",
-    "text": "Hello Quarto\n\n\nWelcome to my Quarto portfolio\n\n\n\n\n\nSep 4, 2026\n\n\nEnzo Katzen\n\n\n\n\n\nNo matching items"
+    "text": "Lab 4: Digital Audio\n\n\n\n\n\n\n\n\nSep 30, 2026\n\n\nEnzo Katzen\n\n\n\n\n\n\n\n\n\n\n\n\nLab 3: Keypad Scanner\n\n\n\n\n\n\n\n\nSep 23, 2026\n\n\nEnzo Katzen\n\n\n\n\n\n\n\n\n\n\n\n\nLab 2: Multiplexed 7-Segment Display\n\n\n\n\n\n\n\n\nSep 16, 2026\n\n\nEnzo Katzen\n\n\n\n\n\n\n\n\n\n\n\n\nLab 1: FPGA and MCU Setup and Testing\n\n\n\n\n\n\n\n\nSep 4, 2026\n\n\nEnzo Katzen\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "labs/lab1/lab1.html",
@@ -53,7 +39,7 @@
     "href": "labs/lab1/lab1.html#technical-documentation",
     "title": "Lab 1: FPGA and MCU Setup and Testing",
     "section": "Technical Documentation",
-    "text": "Technical Documentation\nThe source code for the project can be found in the associated Github repository.\n\nBlock Diagram\n\n\n\n\n\n\nFigure 1: Block diagram of the Verilog design.\n\n\n\nThe block diagram in Figure 1 demonstrates the overall architecture of the design. The top-level module lab1_EK includes three submodules: the high-speed oscillator block (HSOSC), the seven segment display module (sevenSeg), and the counter module (clk_divider).\n\n\nSchematic\n\n\n\n\n\n\nFigure 2: Schematic of the physical circuit.\n\n\n\nFigure 2 shows the physical layout of the design. Internal 100 k\\(\\Omega\\) pullup resistors were used on all inputs to ensure the pins would not be floating. The on board LEDs were connected using a 1 k\\(\\Omega\\) current-limiting resistor to ensure the output current (~2.6 mA) did not exceed the maximum output current of the FPGA I/O pins. The seven segment displays were driven at 3.3V so the reverse voltage from the FPGA I/O pins would match. The seven segment displays were connected using a 150 \\(\\Omega\\) current limiting resistor to ensure the output current does not exceed the maximum drain current of the FPGA I/O pins. A resistor was needed for each segment to maintain even current (and brightness) across all segments. The resistor values are derived in Figure 8."
+    "text": "Technical Documentation\nThe source code for the project can be found in the associated Github repository.\n\nSchematic\n\n\n\n\n\n\nFigure 1: Schematic of the physical circuit.\n\n\n\nFigure 1 shows the physical layout of the design. Internal 100 k\\(\\Omega\\) pullup resistors were used on all inputs to ensure the pins would not be floating. The on board LEDs were connected using a 1 k\\(\\Omega\\) current-limiting resistor to ensure the output current (~2.6 mA) did not exceed the maximum output current of the FPGA I/O pins. The seven segment displays were driven at 3.3V so the reverse voltage from the FPGA I/O pins would match. The seven segment displays were connected using a 150 \\(\\Omega\\) current limiting resistor to ensure the output current does not exceed the maximum drain current of the FPGA I/O pins. A resistor was needed for each segment to maintain even current (and brightness) across all segments. The resistor values are derived in Figure 8.\n\n\nBlock Diagram\n\n\n\n\n\n\nFigure 2: Block diagram of the Verilog design.\n\n\n\nThe block diagram in Figure 2 demonstrates the overall architecture of the design. The top-level module lab1_EK includes three submodules: the high-speed oscillator block (HSOSC), the seven segment display module (sevenSeg), and the counter module (clk_divider)."
   },
   {
     "objectID": "labs/lab1/lab1.html#results-and-discussion",
@@ -82,6 +68,76 @@
     "title": "Lab 1: FPGA and MCU Setup and Testing",
     "section": "AI Prototype Summary",
     "text": "AI Prototype Summary\n\n\n\n\n\n\nNoteAI Generated Code\n\n\n\n\n\nmodule led_blink #(\n    parameter int unsigned CLK_FREQ_HZ = 48_000_000,\n    parameter int unsigned BLINK_HZ    = 2\n) (\n    output logic led\n);\n\n    // Toggle the LED every half-period.\n    localparam int unsigned HALF_PERIOD =\n        CLK_FREQ_HZ / (2 * BLINK_HZ);\n\n    // Width automatically sized for the required count.\n    localparam int unsigned COUNTER_WIDTH =\n        (HALF_PERIOD &lt;= 1) ? 1 : $clog2(HALF_PERIOD);\n\n    logic clk;\n    logic [COUNTER_WIDTH-1:0] counter;\n\n    // Lattice iCE40 UltraPlus internal high-frequency oscillator.\n    HSOSC #(\n        .CLKHF_DIV(2'b00)       // 48 MHz\n    ) hfosc (\n        .CLKHFPU(1'b1),          // Power up oscillator\n        .CLKHFEN(1'b1),          // Enable clock output\n        .CLKHF  (clk)\n    );\n\n    // Divide 48 MHz down to a 2 Hz LED blink.\n    always_ff @(posedge clk) begin\n        if (counter == HALF_PERIOD - 1) begin\n            counter &lt;= '0;\n            led     &lt;= ~led;\n        end\n        else begin\n            counter &lt;= counter + 1'b1;\n        end\n    end\n\nendmodule\n\n\n\nI used the free non-signed-in version of ChatGPT to generate this code using the provided LLM prompt. Initially the code did not compile due to it assuming that I was using “Yosys/nexpnr”, which lead it to use SB_HFOSC instead of HSOSC. However, after I specified that I was using Lattice Radiant, it switched it to using the correct HSOSC module. This was able to successfully synthesize and implement on the FPGA, and the LED blinked at the correct frequency.\nI would say that is code is of fairly decent quality. It comments well, uses descriptive variable names, and uses cohesive capitalization and formatting. However, it over defines many variables, and seems to be overcomplicated for the task at hand. It used some things that I had never seen before, such as using underscores as commas to make large numbers more readable, localparams, and the $clog2 function. If I were to use an LLM in my workflow, I would give it clear instructions of how I want it to achieve the task. This way the LLM will not overcomplicate the code and will act as a helper that can write the easy parts of the code while I focus on the more difficult parts."
+  },
+  {
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "E155 Blog",
+    "section": "",
+    "text": "Hello Quarto\n\n\nWelcome to my Quarto portfolio\n\n\n\n\n\nSep 4, 2026\n\n\nEnzo Katzen\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "E155 Portfolio",
+    "section": "",
+    "text": "Enzo Katzen is a Mathematical and Computational Biology joint major at Harvey Mudd College. Prior to studying at Harvey Mudd, he went to Brooklyn Technical High School in New York City. He is primarily interested in the field of biology, with a particular focus on developmental biology and the burgeoning field of biocomputing. He also has a strong interest in low-level programming and computer engineering, which he has explored through various projects and coursework."
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html",
+    "href": "labs/lab4/Lab4.html",
+    "title": "Lab 4: Digital Audio",
+    "section": "",
+    "text": "In this lab, the a STM32L432KC MCU was used to play music on a basic speaker. Music was provided as a 2D integer array containing the notes frequency in Hz in the first column, and the note length in ms in the second column. Rests were provided as notes with a frequency of 0 Hz. Based on this, we had to wrote code an design a circuit that would play the music without damaging the MCU’s GPIO pins. Additionally, a potentiometer was implemented to adjust volume."
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#introduction",
+    "href": "labs/lab4/Lab4.html#introduction",
+    "title": "Lab 4: Digital Audio",
+    "section": "",
+    "text": "In this lab, the a STM32L432KC MCU was used to play music on a basic speaker. Music was provided as a 2D integer array containing the notes frequency in Hz in the first column, and the note length in ms in the second column. Rests were provided as notes with a frequency of 0 Hz. Based on this, we had to wrote code an design a circuit that would play the music without damaging the MCU’s GPIO pins. Additionally, a potentiometer was implemented to adjust volume."
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#design-and-testing-methodology",
+    "href": "labs/lab4/Lab4.html#design-and-testing-methodology",
+    "title": "Lab 4: Digital Audio",
+    "section": "Design and Testing Methodology",
+    "text": "Design and Testing Methodology\nFor the delays, a timer was set to overflow at a rate of 1 KHz as the length of all inputs was in ms. As the onboard MSI generated a signal at 4 MHz, it was divided using TIM6 down to 1 KHz. This was tested using an oscilloscope to confirm that notes lasted as long as they were described in code.\n\n\n\n\n\n\nNoteDelay Code\n\n\n\n\n\nvoid msDelay(int ms, bool rest) {\n    while(--ms &gt;= 0) {\n        //will be high once every ms\n        while (!(TIM6-&gt;SR)){\n            //only pin when it is not a rest\n            if((TIM7-&gt;SR) & (!rest)){\n                togglePin(OUT_PIN);\n                //reset flag as it needs to be done manually\n                TIM7-&gt;SR &= (0);\n            }\n        }\n        //reset flag as it needs to be done manually\n        TIM6-&gt;SR &= (0);  \n   }\n}\n\n\n\nFor the notes themselves, a similar structure of using a timer to divide the 4MHz MSI clock was used. For this, TIM7 was used. To prevent dividing by 0, the code first checked that the frequency of a note was not 0 before calculating the counter needed to achieve this frequency. For both the delay and the frequency, the status register was used to evaluate when the counter had overflowed. This was tested by setting a long duration note to a known frequency, and using an oscilloscope to confirm that the outputted frequency matched.\n\n\n\n\n\n\nNoteNote Code\n\n\n\n\n\nbool setFreq(int freq){\n    //Frequency 0 means the note is rest\n    if(freq == 0){\n        //don't output power during a rest\n        digitalWrite(OUT_PIN, 0);\n        return true;\n    }else{\n        //See calculations for math\n        uint16_t counter = CLOCK_FREQUENCY / (2*freq);\n        TIM7-&gt;ARR = counter-1;\n        //Counter could be greater than ARR, and it only roles over when \"counter reaches the overflow [ARR]\"\n        TIM7-&gt;CNT = 0;\n        //Flag could become high during a rest and wouldnot be reset\n        TIM7-&gt;SR &= (0);\n        return false;\n    }\n}\n\n\n\nThe electronics were designed according to the schematics shown in the amplifiers datasheet. However, a ~10x voltage divider (see calculations) was implemented around a 10 K ohm potentiometer to gain more accuracy in volume control. The electronics were tested using a 8 ohm resistor to prevent overpowering the speaker.\nLastly, the overall design was tested in practice by using a speaker to confirm everything sounded accurate."
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#technical-documentation",
+    "href": "labs/lab4/Lab4.html#technical-documentation",
+    "title": "Lab 4: Digital Audio",
+    "section": "Technical Documentation",
+    "text": "Technical Documentation\nThe source code for the project can be found in the associated Github repository.\n\nSchematic\n\n\n\n\n\n\nFigure 1: Schematic of the physical circuit.\n\n\n\n\n\nImplementation Documentation\n\n\n\n\n\n\nFigure 2: Graph showing % error vs frequency of each note\n\n\n\nThis design is able to play frequencies from 30.52 Hz to 2000000 Hz, and will not encounter a &gt;= 1% error with any frequencies under 20000 Hz. Additionally, Figure 2 clearly shows how this design will play all notes of Fur Elise with a significantly &lt;1% error. It can play notes of any length from 0 - 65535 ms. Checking at 220 Hz and 1000 Hz is not sufficient to show that all notes are within error bounds as 1000 Hz has an error of 0% and 220 Hz has an error of 0.01%, while the maximum error among all notes is 0.0297%. As the maximum error is far higher than those at either 1000 Hz or 200 Hz, just checking those is not sufficient."
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#results-and-discussion",
+    "href": "labs/lab4/Lab4.html#results-and-discussion",
+    "title": "Lab 4: Digital Audio",
+    "section": "Results and Discussion",
+    "text": "Results and Discussion\nThis design was able to achieve all tasks. Both mathematically and in the final implementation, the code was able to accurately translate inputted code into accurate sounds. Fur Elise sounded accurate, and the additional song I implemented also sounded correct. The potentiometer based volume control I implemented also worked. However, for an unknown reason my circuit has some amount of audio distortion. I have confirmed this is not due to my code as if I put my MCU on other students boards, audio plays without distortion. Additionally, only a fraction of my potentiometer actually adjusts volume, and increasing it or decreasing it beyond that range either results in no increase in volume or the speaker not playing."
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#conclusion",
+    "href": "labs/lab4/Lab4.html#conclusion",
+    "title": "Lab 4: Digital Audio",
+    "section": "Conclusion",
+    "text": "Conclusion\nThe MCU was properly programmed and the circuit was properly assembled, resulting in a design that was able to play music based on inputs and control volume via a potentiometer.\nI spent a total of twelve hours working on this lab."
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#calculations",
+    "href": "labs/lab4/Lab4.html#calculations",
+    "title": "Lab 4: Digital Audio",
+    "section": "Calculations",
+    "text": "Calculations\nCalculations for the error, maximum and minimum frequencies and delay lengths, and the voltage divider can be found in this spreadsheet: Lab 4 Calculations"
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#ai-prototype-summary",
+    "href": "labs/lab4/Lab4.html#ai-prototype-summary",
+    "title": "Lab 4: Digital Audio",
+    "section": "AI Prototype Summary",
+    "text": "AI Prototype Summary\nI used the Claude Pro set to Opus 5.5 with medium effort for these responses.\nWithout giving the LLM the datasheet, it generated a very clear, thought out, and accurate response in under 45 seconds. It described each timer, its advantages and drawbacks, and formatted the information in a readable chart Figure 3. From there, it walked me through its decision of a timer, wrote out all relevant formulae, described the purpose of each, and gave an example. From there, it not just wrote out the relevant registers, but what they should be set to, and example code. This code was very similar to my setup, and even used bitwise logic to accurately set bits like I did in my code. Its reasoning was different than mine as it prioritized using a timer that could output directly to GPIO pins without additional setup, while I focused on using a similar timer and building on top of that in code. Overall, the LLM seemed to be far better at this than writing HDL code, and was much faster than going through the datasheet myself.\n\n\n\n\n\n\nNoteTable Generated Without Datasheet\n\n\n\n\n\n\n\n\n\n\n\nFigure 3\n\n\n\n\n\n\nI repeated the same prompt, but gave the LLM the datasheet, and it failed as the reference manual was too large. However, as the answers generated without the manual were already very accurate and detailed, I think giving it the manual would not have been helpful as it would have just slowed it down to process the new context."
   },
   {
     "objectID": "posts/first-post.html",
