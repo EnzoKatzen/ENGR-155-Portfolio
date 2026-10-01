@@ -76,6 +76,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -295,7 +324,7 @@ Figure&nbsp;2: Graph showing % error vs frequency of each note
 </section>
 <section id="calculations" class="level2">
 <h2 class="anchored" data-anchor-id="calculations">Calculations</h2>
-<p>Calculations for the error, maximum and minimum frequencies and delay lengths, and the voltage divider can be found in this spreadsheet: <a href="https://docs.google.com/spreadsheets/d/159cZQWkQmnJzNAv55zveGSCvQ6ZP7RSPB9wTwZFsCWw/edit?usp=sharing">Lab 4 Calculations</a></p>
+<p>To calculate the error of each frequency, I first calculated the idealized counter using the formula <span class="math inline">\(c_{ideal} = \frac{f_{clk}}{2*f_{desired}}\)</span>, then, as counter can only be an integer, I took the floor of that to be <span class="math inline">\(c_{real} = \lfloor c_{ideal} \rfloor\)</span>. Then, I calculated the true frequency using <span class="math inline">\(f_{real} = \frac{f_{clk}}{c_{real}}\)</span>. Lastly, I found the error via <span class="math inline">\(\frac{f_{real}-f_{desired}}{f_{desired}}\)</span>. To find maximum and minimum frequency, I divided <span class="math inline">\(f_{clk}\)</span> by the max and min values of counter. To find maximum and minimum delay, I multiplied 1 ms by the maximum and minimum positive values of the STM32 integer. Calculations for the error, maximum and minimum frequencies and delay lengths, and the voltage divider can be found in this spreadsheet: <a href="https://docs.google.com/spreadsheets/d/159cZQWkQmnJzNAv55zveGSCvQ6ZP7RSPB9wTwZFsCWw/edit?usp=sharing">Lab 4 Calculations</a></p>
 </section>
 <section id="ai-prototype-summary" class="level2">
 <h2 class="anchored" data-anchor-id="ai-prototype-summary">AI Prototype Summary</h2>
