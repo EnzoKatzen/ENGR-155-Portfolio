@@ -96,7 +96,7 @@ The MCU was properly programmed and the circuit was properly assembled, resultin
 I spent a total of twelve hours working on this lab.
 
 ## Calculations
-
+To calculate the error of each frequency, I first calculated the idealized counter using the formula $c_{ideal} = \frac{f_{clk}}{2*f_{desired}}$, then, as counter can only be an integer, I took the floor of that to be $c_{real} = \lfloor c_{ideal} \rfloor$. Then, I calculated the true frequency using $f_{real} = \frac{f_{clk}}{c_{real}}$. Lastly, I found the error via $\frac{f_{real}-f_{desired}}{f_{desired}}$. To find maximum and minimum frequency, I divided $f_{clk}$ by the max and min values of counter. To find maximum and minimum delay, I multiplied 1 ms by the maximum and minimum positive values of the STM32 integer.
 Calculations for the error, maximum and minimum frequencies and delay lengths, and the voltage divider can be found in this spreadsheet: [Lab 4 Calculations](https://docs.google.com/spreadsheets/d/159cZQWkQmnJzNAv55zveGSCvQ6ZP7RSPB9wTwZFsCWw/edit?usp=sharing)
 
 ## AI Prototype Summary
