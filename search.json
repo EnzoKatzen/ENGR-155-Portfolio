@@ -11,7 +11,77 @@
     "href": "labs.html",
     "title": "E155 Labs",
     "section": "",
-    "text": "Lab 4: Digital Audio\n\n\n\n\n\n\n\n\nSep 30, 2026\n\n\nEnzo Katzen\n\n\n\n\n\n\n\n\n\n\n\n\nLab 3: Keypad Scanner\n\n\n\n\n\n\n\n\nSep 23, 2026\n\n\nEnzo Katzen\n\n\n\n\n\n\n\n\n\n\n\n\nLab 2: Multiplexed 7-Segment Display\n\n\n\n\n\n\n\n\nSep 16, 2026\n\n\nEnzo Katzen\n\n\n\n\n\n\n\n\n\n\n\n\nLab 1: FPGA and MCU Setup and Testing\n\n\n\n\n\n\n\n\nSep 4, 2026\n\n\nEnzo Katzen\n\n\n\n\n\nNo matching items"
+    "text": "Lab 5: Interrupts\n\n\n\n\n\n\n\n\nOct 7, 2026\n\n\nEnzo Katzen\n\n\n\n\n\n\n\n\n\n\n\n\nLab 4: Digital Audio\n\n\n\n\n\n\n\n\nSep 30, 2026\n\n\nEnzo Katzen\n\n\n\n\n\n\n\n\n\n\n\n\nLab 3: Keypad Scanner\n\n\n\n\n\n\n\n\nSep 23, 2026\n\n\nEnzo Katzen\n\n\n\n\n\n\n\n\n\n\n\n\nLab 2: Multiplexed 7-Segment Display\n\n\n\n\n\n\n\n\nSep 16, 2026\n\n\nEnzo Katzen\n\n\n\n\n\n\n\n\n\n\n\n\nLab 1: FPGA and MCU Setup and Testing\n\n\n\n\n\n\n\n\nSep 4, 2026\n\n\nEnzo Katzen\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html",
+    "href": "labs/lab4/Lab4.html",
+    "title": "Lab 4: Digital Audio",
+    "section": "",
+    "text": "In this lab, the a STM32L432KC MCU was used to play music on a basic speaker. Music was provided as a 2D integer array containing the notes frequency in Hz in the first column, and the note length in ms in the second column. Rests were provided as notes with a frequency of 0 Hz. Based on this, we had to wrote code an design a circuit that would play the music without damaging the MCU’s GPIO pins. Additionally, a potentiometer was implemented to adjust volume."
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#introduction",
+    "href": "labs/lab4/Lab4.html#introduction",
+    "title": "Lab 4: Digital Audio",
+    "section": "",
+    "text": "In this lab, the a STM32L432KC MCU was used to play music on a basic speaker. Music was provided as a 2D integer array containing the notes frequency in Hz in the first column, and the note length in ms in the second column. Rests were provided as notes with a frequency of 0 Hz. Based on this, we had to wrote code an design a circuit that would play the music without damaging the MCU’s GPIO pins. Additionally, a potentiometer was implemented to adjust volume."
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#design-and-testing-methodology",
+    "href": "labs/lab4/Lab4.html#design-and-testing-methodology",
+    "title": "Lab 4: Digital Audio",
+    "section": "Design and Testing Methodology",
+    "text": "Design and Testing Methodology\nFor the delays, a timer was set to overflow at a rate of 1 KHz as the length of all inputs was in ms. As the onboard MSI generated a signal at 4 MHz, it was divided using TIM6 down to 1 KHz. This was tested using an oscilloscope to confirm that notes lasted as long as they were described in code.\n\n\n\n\n\n\nNoteDelay Code\n\n\n\n\n\nvoid msDelay(int ms, bool rest) {\n    while(--ms &gt;= 0) {\n        //will be high once every ms\n        while (!(TIM6-&gt;SR)){\n            //only pin when it is not a rest\n            if((TIM7-&gt;SR) & (!rest)){\n                togglePin(OUT_PIN);\n                //reset flag as it needs to be done manually\n                TIM7-&gt;SR &= (0);\n            }\n        }\n        //reset flag as it needs to be done manually\n        TIM6-&gt;SR &= (0);  \n   }\n}\n\n\n\nFor the notes themselves, a similar structure of using a timer to divide the 4MHz MSI clock was used. For this, TIM7 was used. To prevent dividing by 0, the code first checked that the frequency of a note was not 0 before calculating the counter needed to achieve this frequency. For both the delay and the frequency, the status register was used to evaluate when the counter had overflowed. This was tested by setting a long duration note to a known frequency, and using an oscilloscope to confirm that the outputted frequency matched.\n\n\n\n\n\n\nNoteNote Code\n\n\n\n\n\nbool setFreq(int freq){\n    //Frequency 0 means the note is rest\n    if(freq == 0){\n        //don't output power during a rest\n        digitalWrite(OUT_PIN, 0);\n        return true;\n    }else{\n        //See calculations for math\n        uint16_t counter = CLOCK_FREQUENCY / (2*freq);\n        TIM7-&gt;ARR = counter-1;\n        //Counter could be greater than ARR, and it only roles over when \"counter reaches the overflow [ARR]\"\n        TIM7-&gt;CNT = 0;\n        //Flag could become high during a rest and wouldnot be reset\n        TIM7-&gt;SR &= (0);\n        return false;\n    }\n}\n\n\n\nThe electronics were designed according to the schematics shown in the amplifiers datasheet. However, a ~10x voltage divider (see calculations) was implemented around a 10 K ohm potentiometer to gain more accuracy in volume control. The electronics were tested using a 8 ohm resistor to prevent overpowering the speaker.\nLastly, the overall design was tested in practice by using a speaker to confirm everything sounded accurate."
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#technical-documentation",
+    "href": "labs/lab4/Lab4.html#technical-documentation",
+    "title": "Lab 4: Digital Audio",
+    "section": "Technical Documentation",
+    "text": "Technical Documentation\nThe source code for the project can be found in the associated Github repository.\n\nSchematic\n\n\n\n\n\n\nFigure 1: Schematic of the physical circuit.\n\n\n\n\n\nImplementation Documentation\n\n\n\n\n\n\nFigure 2: Graph showing % error vs frequency of each note\n\n\n\nThis design is able to play frequencies from 30.52 Hz to 2000000 Hz, and will not encounter a &gt;= 1% error with any frequencies under 20000 Hz. Additionally, Figure 2 clearly shows how this design will play all notes of Fur Elise with a significantly &lt;1% error. It can play notes of any length from 0 - 65535 ms. Checking at 220 Hz and 1000 Hz is not sufficient to show that all notes are within error bounds as 1000 Hz has an error of 0% and 220 Hz has an error of 0.01%, while the maximum error among all notes is 0.0297%. As the maximum error is far higher than those at either 1000 Hz or 200 Hz, just checking those is not sufficient."
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#results-and-discussion",
+    "href": "labs/lab4/Lab4.html#results-and-discussion",
+    "title": "Lab 4: Digital Audio",
+    "section": "Results and Discussion",
+    "text": "Results and Discussion\nThis design was able to achieve all tasks. Both mathematically and in the final implementation, the code was able to accurately translate inputted code into accurate sounds. Fur Elise sounded accurate, and the additional song I implemented also sounded correct. The potentiometer based volume control I implemented also worked. However, for an unknown reason my circuit has some amount of audio distortion. I have confirmed this is not due to my code as if I put my MCU on other students boards, audio plays without distortion. Additionally, only a fraction of my potentiometer actually adjusts volume, and increasing it or decreasing it beyond that range either results in no increase in volume or the speaker not playing."
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#conclusion",
+    "href": "labs/lab4/Lab4.html#conclusion",
+    "title": "Lab 4: Digital Audio",
+    "section": "Conclusion",
+    "text": "Conclusion\nThe MCU was properly programmed and the circuit was properly assembled, resulting in a design that was able to play music based on inputs and control volume via a potentiometer.\nI spent a total of twelve hours working on this lab."
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#calculations",
+    "href": "labs/lab4/Lab4.html#calculations",
+    "title": "Lab 4: Digital Audio",
+    "section": "Calculations",
+    "text": "Calculations\nTo calculate the error of each frequency, I first calculated the idealized counter using the formula \\(c_{ideal} = \\frac{f_{clk}}{2*f_{desired}}\\), then, as counter can only be an integer, I took the floor of that to be \\(c_{real} = \\lfloor c_{ideal} \\rfloor\\). Then, I calculated the true frequency using \\(f_{real} = \\frac{f_{clk}}{c_{real}}\\). Lastly, I found the error via \\(\\frac{f_{real}-f_{desired}}{f_{desired}}\\). To find maximum and minimum frequency, I divided \\(f_{clk}\\) by the max and min values of counter. To find maximum and minimum delay, I multiplied 1 ms by the maximum and minimum positive values of the STM32 integer. Calculations for the error, maximum and minimum frequencies and delay lengths, and the voltage divider can be found in this spreadsheet: Lab 4 Calculations"
+  },
+  {
+    "objectID": "labs/lab4/Lab4.html#ai-prototype-summary",
+    "href": "labs/lab4/Lab4.html#ai-prototype-summary",
+    "title": "Lab 4: Digital Audio",
+    "section": "AI Prototype Summary",
+    "text": "AI Prototype Summary\nI used the Claude Pro set to Opus 5.5 with medium effort for these responses.\nWithout giving the LLM the datasheet, it generated a very clear, thought out, and accurate response in under 45 seconds. It described each timer, its advantages and drawbacks, and formatted the information in a readable chart Figure 3. From there, it walked me through its decision of a timer, wrote out all relevant formulae, described the purpose of each, and gave an example. From there, it not just wrote out the relevant registers, but what they should be set to, and example code. This code was very similar to my setup, and even used bitwise logic to accurately set bits like I did in my code. Its reasoning was different than mine as it prioritized using a timer that could output directly to GPIO pins without additional setup, while I focused on using a similar timer and building on top of that in code. Overall, the LLM seemed to be far better at this than writing HDL code, and was much faster than going through the datasheet myself.\n\n\n\n\n\n\nNoteTable Generated Without Datasheet\n\n\n\n\n\n\n\n\n\n\n\nFigure 3\n\n\n\n\n\n\nI repeated the same prompt, but gave the LLM the datasheet, and it failed as the reference manual was too large. However, as the answers generated without the manual were already very accurate and detailed, I think giving it the manual would not have been helpful as it would have just slowed it down to process the new context."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "E155 Portfolio",
+    "section": "",
+    "text": "Enzo Katzen is a Mathematical and Computational Biology joint major at Harvey Mudd College. Prior to studying at Harvey Mudd, he went to Brooklyn Technical High School in New York City. He is primarily interested in the field of biology, with a particular focus on developmental biology and the burgeoning field of biocomputing. He also has a strong interest in low-level programming and computer engineering, which he has explored through various projects and coursework."
+  },
+  {
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "E155 Blog",
+    "section": "",
+    "text": "Hello Quarto\n\n\nWelcome to my Quarto portfolio\n\n\n\n\n\nSep 4, 2026\n\n\nEnzo Katzen\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "labs/lab1/lab1.html",
@@ -70,74 +140,60 @@
     "text": "AI Prototype Summary\n\n\n\n\n\n\nNoteAI Generated Code\n\n\n\n\n\nmodule led_blink #(\n    parameter int unsigned CLK_FREQ_HZ = 48_000_000,\n    parameter int unsigned BLINK_HZ    = 2\n) (\n    output logic led\n);\n\n    // Toggle the LED every half-period.\n    localparam int unsigned HALF_PERIOD =\n        CLK_FREQ_HZ / (2 * BLINK_HZ);\n\n    // Width automatically sized for the required count.\n    localparam int unsigned COUNTER_WIDTH =\n        (HALF_PERIOD &lt;= 1) ? 1 : $clog2(HALF_PERIOD);\n\n    logic clk;\n    logic [COUNTER_WIDTH-1:0] counter;\n\n    // Lattice iCE40 UltraPlus internal high-frequency oscillator.\n    HSOSC #(\n        .CLKHF_DIV(2'b00)       // 48 MHz\n    ) hfosc (\n        .CLKHFPU(1'b1),          // Power up oscillator\n        .CLKHFEN(1'b1),          // Enable clock output\n        .CLKHF  (clk)\n    );\n\n    // Divide 48 MHz down to a 2 Hz LED blink.\n    always_ff @(posedge clk) begin\n        if (counter == HALF_PERIOD - 1) begin\n            counter &lt;= '0;\n            led     &lt;= ~led;\n        end\n        else begin\n            counter &lt;= counter + 1'b1;\n        end\n    end\n\nendmodule\n\n\n\nI used the free non-signed-in version of ChatGPT to generate this code using the provided LLM prompt. Initially the code did not compile due to it assuming that I was using “Yosys/nexpnr”, which lead it to use SB_HFOSC instead of HSOSC. However, after I specified that I was using Lattice Radiant, it switched it to using the correct HSOSC module. This was able to successfully synthesize and implement on the FPGA, and the LED blinked at the correct frequency.\nI would say that is code is of fairly decent quality. It comments well, uses descriptive variable names, and uses cohesive capitalization and formatting. However, it over defines many variables, and seems to be overcomplicated for the task at hand. It used some things that I had never seen before, such as using underscores as commas to make large numbers more readable, localparams, and the $clog2 function. If I were to use an LLM in my workflow, I would give it clear instructions of how I want it to achieve the task. This way the LLM will not overcomplicate the code and will act as a helper that can write the easy parts of the code while I focus on the more difficult parts."
   },
   {
-    "objectID": "blog.html",
-    "href": "blog.html",
-    "title": "E155 Blog",
+    "objectID": "labs/lab5/Lab5.html",
+    "href": "labs/lab5/Lab5.html",
+    "title": "Lab 5: Interrupts",
     "section": "",
-    "text": "Hello Quarto\n\n\nWelcome to my Quarto portfolio\n\n\n\n\n\nSep 4, 2026\n\n\nEnzo Katzen\n\n\n\n\n\nNo matching items"
+    "text": "In this lab, a STM32L432KC MCU was used to determine the speed of a motor. This was done by reading from a quadrate encoder using interrupts. From this, we had to calculate the direction and speed at which the motor was turning. To do so, we had to wrote code an design a circuit that would power the motor and encoder without damaging the MCU’s GPIO pins."
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "E155 Portfolio",
+    "objectID": "labs/lab5/Lab5.html#introduction",
+    "href": "labs/lab5/Lab5.html#introduction",
+    "title": "Lab 5: Interrupts",
     "section": "",
-    "text": "Enzo Katzen is a Mathematical and Computational Biology joint major at Harvey Mudd College. Prior to studying at Harvey Mudd, he went to Brooklyn Technical High School in New York City. He is primarily interested in the field of biology, with a particular focus on developmental biology and the burgeoning field of biocomputing. He also has a strong interest in low-level programming and computer engineering, which he has explored through various projects and coursework."
+    "text": "In this lab, a STM32L432KC MCU was used to determine the speed of a motor. This was done by reading from a quadrate encoder using interrupts. From this, we had to calculate the direction and speed at which the motor was turning. To do so, we had to wrote code an design a circuit that would power the motor and encoder without damaging the MCU’s GPIO pins."
   },
   {
-    "objectID": "labs/lab4/Lab4.html",
-    "href": "labs/lab4/Lab4.html",
-    "title": "Lab 4: Digital Audio",
-    "section": "",
-    "text": "In this lab, the a STM32L432KC MCU was used to play music on a basic speaker. Music was provided as a 2D integer array containing the notes frequency in Hz in the first column, and the note length in ms in the second column. Rests were provided as notes with a frequency of 0 Hz. Based on this, we had to wrote code an design a circuit that would play the music without damaging the MCU’s GPIO pins. Additionally, a potentiometer was implemented to adjust volume."
-  },
-  {
-    "objectID": "labs/lab4/Lab4.html#introduction",
-    "href": "labs/lab4/Lab4.html#introduction",
-    "title": "Lab 4: Digital Audio",
-    "section": "",
-    "text": "In this lab, the a STM32L432KC MCU was used to play music on a basic speaker. Music was provided as a 2D integer array containing the notes frequency in Hz in the first column, and the note length in ms in the second column. Rests were provided as notes with a frequency of 0 Hz. Based on this, we had to wrote code an design a circuit that would play the music without damaging the MCU’s GPIO pins. Additionally, a potentiometer was implemented to adjust volume."
-  },
-  {
-    "objectID": "labs/lab4/Lab4.html#design-and-testing-methodology",
-    "href": "labs/lab4/Lab4.html#design-and-testing-methodology",
-    "title": "Lab 4: Digital Audio",
+    "objectID": "labs/lab5/Lab5.html#design-and-testing-methodology",
+    "href": "labs/lab5/Lab5.html#design-and-testing-methodology",
+    "title": "Lab 5: Interrupts",
     "section": "Design and Testing Methodology",
-    "text": "Design and Testing Methodology\nFor the delays, a timer was set to overflow at a rate of 1 KHz as the length of all inputs was in ms. As the onboard MSI generated a signal at 4 MHz, it was divided using TIM6 down to 1 KHz. This was tested using an oscilloscope to confirm that notes lasted as long as they were described in code.\n\n\n\n\n\n\nNoteDelay Code\n\n\n\n\n\nvoid msDelay(int ms, bool rest) {\n    while(--ms &gt;= 0) {\n        //will be high once every ms\n        while (!(TIM6-&gt;SR)){\n            //only pin when it is not a rest\n            if((TIM7-&gt;SR) & (!rest)){\n                togglePin(OUT_PIN);\n                //reset flag as it needs to be done manually\n                TIM7-&gt;SR &= (0);\n            }\n        }\n        //reset flag as it needs to be done manually\n        TIM6-&gt;SR &= (0);  \n   }\n}\n\n\n\nFor the notes themselves, a similar structure of using a timer to divide the 4MHz MSI clock was used. For this, TIM7 was used. To prevent dividing by 0, the code first checked that the frequency of a note was not 0 before calculating the counter needed to achieve this frequency. For both the delay and the frequency, the status register was used to evaluate when the counter had overflowed. This was tested by setting a long duration note to a known frequency, and using an oscilloscope to confirm that the outputted frequency matched.\n\n\n\n\n\n\nNoteNote Code\n\n\n\n\n\nbool setFreq(int freq){\n    //Frequency 0 means the note is rest\n    if(freq == 0){\n        //don't output power during a rest\n        digitalWrite(OUT_PIN, 0);\n        return true;\n    }else{\n        //See calculations for math\n        uint16_t counter = CLOCK_FREQUENCY / (2*freq);\n        TIM7-&gt;ARR = counter-1;\n        //Counter could be greater than ARR, and it only roles over when \"counter reaches the overflow [ARR]\"\n        TIM7-&gt;CNT = 0;\n        //Flag could become high during a rest and wouldnot be reset\n        TIM7-&gt;SR &= (0);\n        return false;\n    }\n}\n\n\n\nThe electronics were designed according to the schematics shown in the amplifiers datasheet. However, a ~10x voltage divider (see calculations) was implemented around a 10 K ohm potentiometer to gain more accuracy in volume control. The electronics were tested using a 8 ohm resistor to prevent overpowering the speaker.\nLastly, the overall design was tested in practice by using a speaker to confirm everything sounded accurate."
+    "text": "Design and Testing Methodology\nFirst, the overall 16MHz clock was enabled before initializing the registers needed for the interrupts. From there, input pin was configured to have interrupts enabled using a function that would calculate register offsets on a per pin basis.\n\n\n\n\n\n\nNotePin Offset Enable Code\n\n\n\n\n\n//I put a fair bit of time into making this ultra flexible as I have a feeling having a good interrupt function will be very helpful\nvoid extiEnableBothEdges(int gpio_pin) {\n    int line = gpioPinOffset(gpio_pin);\n    int exticr_index = line / 4;        //4 pin lines in each EXTICR register\n    int exticr_shift = 4 * (line % 4);  //4 bits of registers per pin line (but only 3 are actually set)\n    uint32_t line_mask = 1u &lt;&lt; line;    //make a mask for the registers in EXTI\n    uint32_t exticr_field_mask = 0b111u &lt;&lt; exticr_shift; //make a mask for the 3 bits in the SYSCFG-&gt;EXTICR register for each pin\n    uint32_t exticr_port_code = (uint32_t) gpioPinToPort(gpio_pin) &lt;&lt; exticr_shift; //Get which port, we are using, and enbale for that port \n\n    RCC-&gt;APB2ENR |= RCC_APB2ENR_SYSCFGEN; //turn on clk for interrupts\n\n    SYSCFG-&gt;EXTICR[exticr_index] &= ~exticr_field_mask; //Use mask to clear existing data\n    SYSCFG-&gt;EXTICR[exticr_index] |= exticr_port_code;   //Set the interrupt to point at right port\n\n    EXTI-&gt;RTSR1 |= line_mask;   //Turn on for rising edge\n    EXTI-&gt;FTSR1 |= line_mask;   //Turn on for falling edge\n    EXTI-&gt;PR1 = line_mask;      //Reset any flags\n    EXTI-&gt;IMR1 |= line_mask;    //unmask so we can see what is happening\n}\n\n//Looking at an example makes this more sensible: extiEnableBothEdges(PA9)\n//line              = 9             PA9 is pin 9 of port A, so enable it using EXTI line 9\n//exticr_index          = 9 / 4 = 2         Pin line 9 is set in EXTICR3, but as arrays start at 0, that is EXTICR[2]\n//exticr_shift          = 4 * (9 % 4) = 4               Pin line 9 is bits 6:4 of the right EXTICR register\n//line_mask                     = 1 &lt;&lt; 9 = 0x200                Bit 9 in IMR1, RTSR1, FTSR1, and PR1\n//exticr_field_mask             = 0b111 &lt;&lt; 4            mask on bits 6:4\n//exticr_port_code              = 0 &lt;&lt; 4 = 0            Port A code is 000\n//\n//Result:\n//EXTICR[2] bits 6:4 = 000                                      Line 9 now comes from port A (GPIO pins A)\n//RTSR1 bit 9 = 1                                               Trigger on rising edge\n//FTSR1 bit 9 = 1                       Trigger on falling edge\n//PR1 bit 9 cleared                                             Reset any interrupts\n//IMR1 bit 9 = 1    \n\n\n\nAfter that is completed, the code enters the main loop, which loops waiting for 250ms before calculating the speed of the motor and the direction it was turning. This main loop is depicted in Figure 1.\n\n\n\n\n\n\nFigure 1: Flowchart depicting the main loop.\n\n\n\nAt any point during this main loop - except for when a few variables are being copied - the process can be interrupted by the two interrupts: one for each pin of the encoder. During the interrupt, the motor direction is identified, and based on the direction, a count variable is either incremented or decremented. Following that point, the main loop is continued from where it was left off.\n\n\n\n\n\n\nNoteInterrupt Code\n\n\n\n\n\nvoid EXTI9_5_IRQHandler(void) {\n    uint32_t a_line_mask = 1u &lt;&lt; gpioPinOffset(ENCODER_A_PIN); //mask for that specific pin\n    if (EXTI-&gt;PR1 & a_line_mask) {\n        // Clear first (write 1 to reset) so an edge during handling re-triggers\n        EXTI-&gt;PR1 = a_line_mask;\n\n        if (digitalRead(ENCODER_A_PIN) != digitalRead(ENCODER_B_PIN)) {\n            recordEdge(1);  //If they don't equal, then A moved away from B, so that means A leads, so it is going forward\n        } else {\n            recordEdge(-1); //If they do equal, then A caught up to B, so that means B leads, so it is going backwards\n        }\n    }\n}\n\n//Encoder B input (EXTI lines 10-15)\nvoid EXTI15_10_IRQHandler(void) {\n    uint32_t b_line_mask = 1u &lt;&lt; gpioPinOffset(ENCODER_B_PIN);\n    if (EXTI-&gt;PR1 & b_line_mask) {\n        EXTI-&gt;PR1 = b_line_mask;\n\n        if (digitalRead(ENCODER_A_PIN) == digitalRead(ENCODER_B_PIN)) {\n            recordEdge(1);  //If they do equal, then B caught up to A, so that means A leads, so it is going forward\n        } else {\n            recordEdge(-1); //If they don't equal, then B moved away from A, so that means B leads, so it is going backwards\n        }\n    }\n}\n\n\n\nThe electronics were designed in a very basic manner which is depicted in the schematic. One thing to note is that for the FT pins to sustain a greater than 4V input, their internal pullups must be disabled.\nLastly, the overall design was tested in practice by using an oscilloscope to determine the true motor speed and comparing the program output to that."
   },
   {
-    "objectID": "labs/lab4/Lab4.html#technical-documentation",
-    "href": "labs/lab4/Lab4.html#technical-documentation",
-    "title": "Lab 4: Digital Audio",
+    "objectID": "labs/lab5/Lab5.html#technical-documentation",
+    "href": "labs/lab5/Lab5.html#technical-documentation",
+    "title": "Lab 5: Interrupts",
     "section": "Technical Documentation",
-    "text": "Technical Documentation\nThe source code for the project can be found in the associated Github repository.\n\nSchematic\n\n\n\n\n\n\nFigure 1: Schematic of the physical circuit.\n\n\n\n\n\nImplementation Documentation\n\n\n\n\n\n\nFigure 2: Graph showing % error vs frequency of each note\n\n\n\nThis design is able to play frequencies from 30.52 Hz to 2000000 Hz, and will not encounter a &gt;= 1% error with any frequencies under 20000 Hz. Additionally, Figure 2 clearly shows how this design will play all notes of Fur Elise with a significantly &lt;1% error. It can play notes of any length from 0 - 65535 ms. Checking at 220 Hz and 1000 Hz is not sufficient to show that all notes are within error bounds as 1000 Hz has an error of 0% and 220 Hz has an error of 0.01%, while the maximum error among all notes is 0.0297%. As the maximum error is far higher than those at either 1000 Hz or 200 Hz, just checking those is not sufficient."
+    "text": "Technical Documentation\nThe source code for the project can be found in the associated Github repository.\n\nSchematic\n\n\n\n\n\n\nFigure 2: Schematic of the physical circuit.\n\n\n\n\n\nImplementation Documentation\nRaw encoder pulses are converted to rev/s through a multi-step process. First, during the interrupt, it is calculated whether the pulse that was sent means that the motor is spinning clockwise (CW) or counterclockwise (CCW). If CW, then a counter is incremented, and if CCW, then the counter is decremented. Then, at the end of the main loop, if there was a pulse during the last 250ms, the counter is divided by the pulses per revolution times 4, as there are 4 edges (2 for A and 2 for B) per each pulse. This gives the rev/s. Additional code is used for if there was no pulse in the last 250ms, no pulse in the last 1s, and the motor starting from there being no pulses.\nMy implementation used interrupts instead of polling. This is because polling has the potential to miss a significant number of inputs while it is running through various of segments of code. Using my implementation, there is at most an 18 us span at which a signal could be missed, but with a polling based implementation of my code, that extends to 237 us. For that reason, a polling based approach could be considered to be less effective. However, interrupt based approaches introduce other issues, like significantly more code complexity, higher code overhead, and require far more developed MCUs, which adds significant cost."
   },
   {
-    "objectID": "labs/lab4/Lab4.html#results-and-discussion",
-    "href": "labs/lab4/Lab4.html#results-and-discussion",
-    "title": "Lab 4: Digital Audio",
-    "section": "Results and Discussion",
-    "text": "Results and Discussion\nThis design was able to achieve all tasks. Both mathematically and in the final implementation, the code was able to accurately translate inputted code into accurate sounds. Fur Elise sounded accurate, and the additional song I implemented also sounded correct. The potentiometer based volume control I implemented also worked. However, for an unknown reason my circuit has some amount of audio distortion. I have confirmed this is not due to my code as if I put my MCU on other students boards, audio plays without distortion. Additionally, only a fraction of my potentiometer actually adjusts volume, and increasing it or decreasing it beyond that range either results in no increase in volume or the speaker not playing."
-  },
-  {
-    "objectID": "labs/lab4/Lab4.html#conclusion",
-    "href": "labs/lab4/Lab4.html#conclusion",
-    "title": "Lab 4: Digital Audio",
-    "section": "Conclusion",
-    "text": "Conclusion\nThe MCU was properly programmed and the circuit was properly assembled, resulting in a design that was able to play music based on inputs and control volume via a potentiometer.\nI spent a total of twelve hours working on this lab."
-  },
-  {
-    "objectID": "labs/lab4/Lab4.html#calculations",
-    "href": "labs/lab4/Lab4.html#calculations",
-    "title": "Lab 4: Digital Audio",
+    "objectID": "labs/lab5/Lab5.html#calculations",
+    "href": "labs/lab5/Lab5.html#calculations",
+    "title": "Lab 5: Interrupts",
     "section": "Calculations",
-    "text": "Calculations\nTo calculate the error of each frequency, I first calculated the idealized counter using the formula \\(c_{ideal} = \\frac{f_{clk}}{2*f_{desired}}\\), then, as counter can only be an integer, I took the floor of that to be \\(c_{real} = \\lfloor c_{ideal} \\rfloor\\). Then, I calculated the true frequency using \\(f_{real} = \\frac{f_{clk}}{c_{real}}\\). Lastly, I found the error via \\(\\frac{f_{real}-f_{desired}}{f_{desired}}\\). To find maximum and minimum frequency, I divided \\(f_{clk}\\) by the max and min values of counter. To find maximum and minimum delay, I multiplied 1 ms by the maximum and minimum positive values of the STM32 integer. Calculations for the error, maximum and minimum frequencies and delay lengths, and the voltage divider can be found in this spreadsheet: Lab 4 Calculations"
+    "text": "Calculations\nTo the counter value to rev/s, I first identified how many pulses would be put out from one rotation: \\(P_{PR} = 120\\). Then, I calculated the number of edges per rotation \\(E_{PR} = P_{PR} * 4\\). That is how much my counter will increment per rotation. Once I know that, I can calculate rev/s by dividing my counter by \\(E_{PR}\\).\nTo evaluate the update rate of my implementation, I used Segger Embedded Studio to count the maximum number of clock cycles that could happen before an input would get recognized. Hypothetically, if I had just gotten an edge right as I was about to copy my end of cycle data, and instantly afterwards I got another edge, it would take a total of 285 clock cycles (12 from the base MCU interrupt delay, 255 from my interrupt analysis, and 18 from the end of cycle copying) until I could see the next signal. As the clock is running at 16 MHz, then each clock cycle takes 0.0625 us, and means that the resolution of my implementation is, at its worst, 18 us between interrupts.\nComparatively, the alternative polling implementation could have a delay of 3787 clock cycles, which with the clock running at 16 MHz, equates to a possible worst-case resolution of 237 us between interrupts."
   },
   {
-    "objectID": "labs/lab4/Lab4.html#ai-prototype-summary",
-    "href": "labs/lab4/Lab4.html#ai-prototype-summary",
-    "title": "Lab 4: Digital Audio",
+    "objectID": "labs/lab5/Lab5.html#results-and-discussion",
+    "href": "labs/lab5/Lab5.html#results-and-discussion",
+    "title": "Lab 5: Interrupts",
+    "section": "Results and Discussion",
+    "text": "Results and Discussion\nThis design was able to achieve all tasks. Both mathematically and in the final implementation, the code was able to accurately translate inputs from the encoder into the speed and direction a motor was spinning. Additionally, my interrupt based implementation performed favorably when compared to a polling based implementation, but the complexity of my implementation may cause some issues. Additionally, my circuit was designed to use the proper 5V capable GPIO pins, and disabled the internal pullup resistors to ensure the datasheet was adhered to."
+  },
+  {
+    "objectID": "labs/lab5/Lab5.html#conclusion",
+    "href": "labs/lab5/Lab5.html#conclusion",
+    "title": "Lab 5: Interrupts",
+    "section": "Conclusion",
+    "text": "Conclusion\nThe MCU was properly programmed and the circuit was properly assembled, resulting in a design that was able to recognize which direction and how fast a motor was spinning.\nI spent a total of 10 hours working on this lab."
+  },
+  {
+    "objectID": "labs/lab5/Lab5.html#ai-prototype-summary",
+    "href": "labs/lab5/Lab5.html#ai-prototype-summary",
+    "title": "Lab 5: Interrupts",
     "section": "AI Prototype Summary",
-    "text": "AI Prototype Summary\nI used the Claude Pro set to Opus 5.5 with medium effort for these responses.\nWithout giving the LLM the datasheet, it generated a very clear, thought out, and accurate response in under 45 seconds. It described each timer, its advantages and drawbacks, and formatted the information in a readable chart Figure 3. From there, it walked me through its decision of a timer, wrote out all relevant formulae, described the purpose of each, and gave an example. From there, it not just wrote out the relevant registers, but what they should be set to, and example code. This code was very similar to my setup, and even used bitwise logic to accurately set bits like I did in my code. Its reasoning was different than mine as it prioritized using a timer that could output directly to GPIO pins without additional setup, while I focused on using a similar timer and building on top of that in code. Overall, the LLM seemed to be far better at this than writing HDL code, and was much faster than going through the datasheet myself.\n\n\n\n\n\n\nNoteTable Generated Without Datasheet\n\n\n\n\n\n\n\n\n\n\n\nFigure 3\n\n\n\n\n\n\nI repeated the same prompt, but gave the LLM the datasheet, and it failed as the reference manual was too large. However, as the answers generated without the manual were already very accurate and detailed, I think giving it the manual would not have been helpful as it would have just slowed it down to process the new context."
+    "text": "AI Prototype Summary\nI used the Claude Pro set to Opus 5.5 with medium effort for these responses.\nThe LLM performed quite well, generating a valid selection of pins and code that successfully was able to read from the encoder. It did choose different pins than I did, but this was not due to any issues on the part of the LLM, it simply didn’t have the full context of the dev board. The code was functional, but it was difficult to interpret, even with my C++ experience. For example, it mapped the input from the GPIO pins onto a 2D array, which worked, but was very difficult for me to understand. It also used a lot of registers without many comments, which worked, but made it a little difficult to understand what was happening.\nOverall, due to the LLM’s ability to write functional code very quickly, it makes a lot of sense to use it as a sounding board. It would let me rapidly figure out register maps and how to structure my code, but I might want to actually write my code or give it strict commenting instructions to prevent it from writing hard to interpret code.\n\n\n\n\n\n\nNoteAI Code\n\n\n\n\n\n    static const int8_t qdec_table[16] = {\n        0, -1, +1,  0,\n        +1,  0,  0, -1,\n        -1,  0,  0, +1,\n        0, +1, -1,  0\n    };\n------------------------------------------------------------------------------\n    void encoder_init(void)\n    {\n        /* Clocks: GPIOA and SYSCFG (SYSCFG owns the EXTI port mux) */\n        RCC-&gt;AHB2ENR |= RCC_AHB2ENR_GPIOAEN;\n        RCC-&gt;APB2ENR |= RCC_APB2ENR_SYSCFGEN;\n\n        /* PA9, PA10 as inputs (MODER = 00). Reset value on L4 is analog (11),\n        so this must be cleared explicitly. */\n        GPIOA-&gt;MODER &= ~(GPIO_MODER_MODE9 | GPIO_MODER_MODE10);\n\n        /* Pull-ups (PUPDR = 01). Needed for open-collector encoders; harmless for\n        push-pull ones. Remove if your board has external pull-ups. */\n        GPIOA-&gt;PUPDR &= ~(GPIO_PUPDR_PUPD9 | GPIO_PUPDR_PUPD10);\n        GPIOA-&gt;PUPDR |=  (GPIO_PUPDR_PUPD9_0 | GPIO_PUPDR_PUPD10_0);\n\n        /* Route EXTI9 and EXTI10 to port A (000 = PA). Both live in EXTICR3,\n        which is EXTICR[2] in CMSIS. */\n        SYSCFG-&gt;EXTICR[2] &= ~(SYSCFG_EXTICR3_EXTI9 | SYSCFG_EXTICR3_EXTI10);\n\n        /* Unmask, trigger on both rising and falling edges */\n        EXTI-&gt;IMR1  |= EXTI_IMR1_IM9  | EXTI_IMR1_IM10;\n        EXTI-&gt;RTSR1 |= EXTI_RTSR1_RT9 | EXTI_RTSR1_RT10;\n        EXTI-&gt;FTSR1 |= EXTI_FTSR1_FT9 | EXTI_FTSR1_FT10;\n\n        /* Clear anything pending, capture the starting state */\n        EXTI-&gt;PR1 = EXTI_PR1_PIF9 | EXTI_PR1_PIF10;\n        enc_state = enc_read_pins();\n        enc_count = 0;\n\n        /* SAME priority for both so neither ISR can preempt the other mid-update\n        of the shared enc_state/enc_count. */\n        NVIC_SetPriority(EXTI9_5_IRQn,   ENC_IRQ_PRIORITY);\n        NVIC_SetPriority(EXTI15_10_IRQn, ENC_IRQ_PRIORITY);\n        NVIC_EnableIRQ(EXTI9_5_IRQn);\n        NVIC_EnableIRQ(EXTI15_10_IRQn);\n\n        __enable_irq();\n    }"
   },
   {
     "objectID": "posts/first-post.html",
