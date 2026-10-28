@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Enzo Katzen">
+<meta name="dcterms.date" content="2026-10-21">
+
+<title>Lab 6: The Internet of Things and Serial Peripheral Interface – E155 Portfolio</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-172ba59bd5e0b52282274ba0c0cc16fc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">E155 Portfolio</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../labs.html"> 
+<span class="menu-text">Labs</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../resources.html"> 
+<span class="menu-text">Resources</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#design-and-testing-methodology" id="toc-design-and-testing-methodology" class="nav-link" data-scroll-target="#design-and-testing-methodology">Design and Testing Methodology</a></li>
+  <li><a href="#technical-documentation" id="toc-technical-documentation" class="nav-link" data-scroll-target="#technical-documentation">Technical Documentation</a>
+  <ul class="collapse">
+  <li><a href="#schematic" id="toc-schematic" class="nav-link" data-scroll-target="#schematic">Schematic</a></li>
+  </ul></li>
+  <li><a href="#results-and-discussion" id="toc-results-and-discussion" class="nav-link" data-scroll-target="#results-and-discussion">Results and Discussion</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#ai-prototype-summary" id="toc-ai-prototype-summary" class="nav-link" data-scroll-target="#ai-prototype-summary">AI Prototype Summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Lab 6: The Internet of Things and Serial Peripheral Interface</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Lab Report</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Enzo Katzen </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 21, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>In this lab, a STM32L432KC MCU was used to sense temperature from a DS1722 temperature sensor over SPI. Then, the MCU communicated with a ESP8266 module of UART, which sent the temperature to a HTML webpage which was broadcasted over a WIFI network. Additionally, when a device connected to the ESP’s WIFI network and accessed the webpage, an LED was able to be activated and deactivated, and the resolution of the temperature sensor was able to be changed.</p>
+</section>
+<section id="design-and-testing-methodology" class="level2">
+<h2 class="anchored" data-anchor-id="design-and-testing-methodology">Design and Testing Methodology</h2>
+<p>First, the SPI communication system was designed. This was done by using CMSIS headers to enable the required pins. Following this, a base communication block was designed. This block would wait for any proceeding messages to end, send a 1 byte message, then record the resulting message.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="SPI Send Receive">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>SPI Send Receive
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre class="text"><code>char spiSendReceive(char send){
+    while (!(SPI1-&gt;SR &amp; SPI_SR_TXE));
+    *((volatile char *) (&amp;SPI1-&gt;DR)) = send;
+    while (!(SPI1-&gt;SR &amp; SPI_SR_RXNE));
+    return *((volatile char *) (&amp;SPI1-&gt;DR));
+}</code></pre>
+</div>
+</div>
+</div>
+<p>After that is completed, the block was designed to be ran twice to actually create the fundamental messages that are used in an SPI connection.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="SPI Messaging Blocks">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>SPI Messaging Blocks
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre class="text"><code>void spiWrite(char address, char write){
+    digitalWrite(CE_PIN, 1);
+    spiSendReceive(address);
+    spiSendReceive(write); 
+    while (SPI1-&gt;SR &amp; SPI_SR_BSY);
+    digitalWrite(CE_PIN, 0);
+}
+
+char spiRead(char address){
+    digitalWrite(CE_PIN, 1);
+    spiSendReceive(address);
+    char val = spiSendReceive(0x00); //empty as this is just to receive data.
+    while (SPI1-&gt;SR &amp; SPI_SR_BSY);
+    digitalWrite(CE_PIN, 0);
+    return val;
+}</code></pre>
+</div>
+</div>
+</div>
+<p>To test this, a basic SPI communication block was ran, and each of the four signals used in an SPI connection (CE/EN, SCK/SCLK, MOSI/SDI, MISO/SDO) were measured on an oscilloscope to ensure that the communication was ran properly.</p>
+<div id="fig-SPI" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-SPI-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/Annotated O-Scope.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-SPI-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Waveform of an SPI signalling block.
+</figcaption>
+</figure>
+</div>
+<p>Each of these communication blocks were used in the main loop. This loop would wait for a user input to be sent into the web page, which would get passed over UART from the ESP to the MCU. Then, the MCU would read the input, and based on it either change the LED state or send the new temperature resolution to the DS1722. Following this, the current temperature would be read, and it and the current LED state would be written to HTML code. This HTML code would then be sent back to the ESP to be broadcasted on the website.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Main Code Loop">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Main Code Loop
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre class="text"><code>  while(1) {
+    /* Wait for ESP8266 to send a request.
+    Requests take the form of '/REQ:&lt;tag&gt;\n', with TAG begin &lt;= 10 characters.
+    Therefore the request[] array must be able to contain 18 characters.
+    */
+
+    // Receive web request from the ESP
+    char request[BUFF_LEN] = "                  "; // initialize to known value
+    int charIndex = 0;
+  
+    // Keep going until you get end of line character
+    while(inString(request, "\n") == -1) {
+      // Wait for a complete request to be transmitted before processing
+      while(!(USART-&gt;ISR &amp; USART_ISR_RXNE));
+      request[charIndex++] = readChar(USART);
+    }
+    
+    if(inString(request, "led") == 1) {
+      led_status = updateLEDStatus(request);
+    }else if(inString(request, "r") == 1){
+      updateTempRes(request);
+    }
+
+    char tempStatusStr[50];
+    readTemp(tempStatusStr);
+
+    // Update string with current LED state
+
+
+    char ledStatusStr[20];
+    if (led_status == 1)
+      sprintf(ledStatusStr,"LED is on!");
+    else if (led_status == 0)
+      sprintf(ledStatusStr,"LED is off!");
+
+    // finally, transmit the webpage over UART
+    sendString(USART, webpageStart); // webpage header code
+    sendString(USART, ledStr); // button for controlling LED
+
+    sendString(USART, "&lt;h2&gt;LED Status&lt;/h2&gt;");
+
+
+    sendString(USART, "&lt;p&gt;");
+    sendString(USART, ledStatusStr);
+    sendString(USART, "&lt;/p&gt;");
+
+    sendString(USART, "&lt;h2&gt;Temperature Status&lt;/h2&gt;");
+
+    sendString(USART, "&lt;p&gt;");
+    sendString(USART, tempStatusStr);
+    sendString(USART, "&lt;/p&gt;");
+
+    sendString(USART, tempResStr); // buttons for controlling temperature resolution
+
+
+  
+    sendString(USART, webpageEnd);</code></pre>
+</div>
+</div>
+</div>
+<p>The electronics were designed in a very basic manner which is depicted in the schematic. One thing to note is that when I attempted to drive both the LED pin and the SPI CE pin from the same line (LED on PA6 and SPI CE on PB6) the voltage coming out of both pins was halved. This was not supposed to happen, and was rectified by moving SPI CE to a different line (PB7).</p>
+</section>
+<section id="technical-documentation" class="level2">
+<h2 class="anchored" data-anchor-id="technical-documentation">Technical Documentation</h2>
+<p>The source code for the project can be found in the associated <a href="https://github.com/EnzoKatzen/ENGR-155-Lab-6">Github repository</a>.</p>
+<section id="schematic" class="level3">
+<h3 class="anchored" data-anchor-id="schematic">Schematic</h3>
+<div id="fig-schematic" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-schematic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/Lab6Schematic.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-schematic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Schematic of the physical circuit.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="results-and-discussion" class="level2">
+<h2 class="anchored" data-anchor-id="results-and-discussion">Results and Discussion</h2>
+<p>This design was able to achieve all tasks. Despite some electrical issues, the code was able to accurately read temperature at different resolutions form a DS1722 temperature sensor and change the state of an LED. Additionally, my HTML implementation created a simple page that condensed multiple buttons into a single dropdown. Lastly, my SPI communication block ran properly and appeared perfectly on an oscilloscope.</p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>The MCU was properly programmed and the circuit was properly assembled, resulting in a design that was able to read the current temperature and change the status of an LED</p>
+<p>I spent a total of 10 hours working on this lab.</p>
+</section>
+<section id="ai-prototype-summary" class="level2">
+<h2 class="anchored" data-anchor-id="ai-prototype-summary">AI Prototype Summary</h2>
+<p>I used the Claude Pro set to Opus 5.5 with medium effort for these responses.</p>
+<p>Regarding the HTML, LLM performed quite well, generating a pretty (if Claude-y looking) interface that would function very well in an actual system. However, as the only thing I was supposed to send the LLM was the specific prompt given, it did not make code that would be useable in the project. This was due to a variety of reasons, including that the HTML signal lengths being too long, assuming that the temperature sensor had a built API, and the use of unsupported techniques. Simply, the LLM assumed a far more built out and “professional” project, and built a html page that would function well withing that.</p>
+<p>The C code was written in a decently clear manner, but it did some actions, like grouping multiple register edits into a single block that made the code hard to understand. It did some other tasks, like integrating the temperature calculations into the SPI function, that I did not do but did not affect the overall code function. When integrated into the project, the project built and ran properly.</p>
+<p>Overall, LLM worked quite well when applied to both frontend HTML and low-level embedded C. However, the LLM faltered when used to write code without sufficient context of the surrounding project. With that in mind, in the future I would grant the LLM access to my overall code base so it could write code that would be better able to be integrated into my project. Between frontend and low-level code, I would generally apply the LLM to the frontend as I find that code requires less thought and is more rote formatting which it works well for.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="AI HTML Code">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>AI HTML Code
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre class="text"><code>    &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+&lt;title&gt;Temperature sensor&lt;/title&gt;
+&lt;style&gt;
+  :root {
+    --bg: #f5f4ef; --card: #ffffff; --text: #1f1e1d; --muted: #6b6a66;
+    --border: rgba(0,0,0,0.1); --accent: #2f6fd6; --accent-bg: #e6f1fb;
+    --ok: #3b6d11; --ok-bg: #eaf3de; --err: #a32d2d; --err-bg: #fcebeb;
+    --line: #d85a30;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a19; --card: #262624; --text: #f1efe8; --muted: #a3a29c;
+      --border: rgba(255,255,255,0.12); --accent: #5b9bf0; --accent-bg: #0c2c53;
+      --ok: #97c459; --ok-bg: #1f3308; --err: #f09595; --err-bg: #4a1414;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 720px; margin: 0 auto; padding: 2rem 1rem; }
+  h1 { font-size: 22px; font-weight: 500; margin: 0 0 1.5rem; }
+  .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .wide { grid-column: 1 / -1; }
+  .label { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .pill { font-size: 12px; padding: 3px 10px; border-radius: 8px; }
+  .pill.ok { color: var(--ok); background: var(--ok-bg); }
+  .pill.err { color: var(--err); background: var(--err-bg); }
+  .reading { display: flex; align-items: baseline; gap: 6px; margin: 12px 0 4px; }
+  #temp { font-size: 64px; font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums; }
+  #unitLabel { font-size: 24px; color: var(--muted); }
+  .meta { font-size: 13px; color: var(--muted); }
+  svg { width: 100%; height: 60px; margin-top: 12px; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .seg button {
+    border: none; background: transparent; color: var(--text); padding: 8px 14px;
+    font-size: 14px; cursor: pointer; font-family: inherit;
+  }
+  .seg button.on { background: var(--accent-bg); color: var(--accent); }
+  .switch {
+    width: 48px; height: 26px; border-radius: 13px; border: 1px solid var(--border);
+    background: var(--bg); position: relative; cursor: pointer; padding: 0;
+  }
+  .switch span {
+    position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--muted); transition: left 0.15s;
+  }
+  .switch.on { background: var(--accent); }
+  .switch.on span { left: 25px; background: #fff; }
+  #ledState { font-size: 18px; font-weight: 500; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;main&gt;
+  &lt;h1&gt;Temperature sensor&lt;/h1&gt;
+  &lt;div class="grid"&gt;
+    &lt;section class="card wide"&gt;
+      &lt;div class="row"&gt;
+        &lt;span class="meta"&gt;Current temperature&lt;/span&gt;
+        &lt;span id="status" class="pill ok"&gt;Connecting…&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class="reading"&gt;
+        &lt;span id="temp"&gt;--&lt;/span&gt;&lt;span id="unitLabel"&gt;°C&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class="row meta"&gt;
+        &lt;span id="minmax"&gt;Min -- · Max --&lt;/span&gt;
+        &lt;span id="updated"&gt;Waiting for data&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;svg viewBox="0 0 600 60" preserveAspectRatio="none" aria-hidden="true"&gt;
+        &lt;polyline id="spark" fill="none" stroke="var(--line)" stroke-width="2" points=""/&gt;
+      &lt;/svg&gt;
+    &lt;/section&gt;
+
+    &lt;section class="card"&gt;
+      &lt;div class="label"&gt;LED&lt;/div&gt;
+      &lt;div class="row"&gt;
+        &lt;span id="ledState"&gt;Off&lt;/span&gt;
+        &lt;button id="ledSwitch" class="switch" role="switch" aria-checked="false" aria-label="Toggle LED"&gt;&lt;span&gt;&lt;/span&gt;&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;section class="card"&gt;
+      &lt;div class="label"&gt;Display&lt;/div&gt;
+      &lt;div class="row"&gt;
+        &lt;div class="seg" id="precision" role="group" aria-label="Decimal places"&gt;
+          &lt;button data-p="0"&gt;0&lt;/button&gt;
+          &lt;button data-p="1" class="on"&gt;0.0&lt;/button&gt;
+          &lt;button data-p="2"&gt;0.00&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;div class="seg" id="units" role="group" aria-label="Units"&gt;
+          &lt;button data-u="C" class="on"&gt;°C&lt;/button&gt;
+          &lt;button data-u="F"&gt;°F&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+
+&lt;script&gt;
+  // Endpoints your device should serve. Adjust to match your firmware.
+  const API = {
+    temperature: "/api/temperature", // GET  -&gt; { "celsius": 22.4 }
+    led: "/api/led",                 // GET  -&gt; { "on": true }   POST { "on": true }
+    precision: "/api/precision"      // POST { "decimals": 1 }   (optional)
+  };
+  const POLL_MS = 2000;
+  const HISTORY = 60;
+
+  const state = {
+    decimals: +(localStorage.getItem("decimals") ?? 1),
+    unit: localStorage.getItem("unit") ?? "C",
+    led: false,
+    history: [],
+    demo: false
+  };
+  const $ = id =&gt; document.getElementById(id);
+
+  const convert = c =&gt; state.unit === "F" ? c * 9 / 5 + 32 : c;
+  const fmt = c =&gt; convert(c).toFixed(state.decimals);
+
+  function setStatus(ok, text) {
+    $("status").className = "pill " + (ok ? "ok" : "err");
+    $("status").textContent = text;
+  }
+
+  function render() {
+    $("unitLabel").textContent = "°" + state.unit;
+    const h = state.history;
+    if (!h.length) return;
+    $("temp").textContent = fmt(h[h.length - 1]);
+    $("minmax").textContent = `Min ${fmt(Math.min(...h))} · Max ${fmt(Math.max(...h))}`;
+    const lo = Math.min(...h) - 0.2, hi = Math.max(...h) + 0.2;
+    $("spark").setAttribute("points", h.map((v, i) =&gt;
+      `${(i * 600 / Math.max(h.length - 1, 1)).toFixed(1)},${(55 - (v - lo) / (hi - lo) * 50).toFixed(1)}`
+    ).join(" "));
+  }
+
+  let demoValue = 22.4;
+  async function readTemperature() {
+    try {
+      const res = await fetch(API.temperature, { cache: "no-store" });
+      if (!res.ok) throw new Error(res.status);
+      const data = await res.json();
+      state.demo = false;
+      setStatus(true, "Connected");
+      return data.celsius;
+    } catch {
+      state.demo = true;
+      setStatus(false, "Demo data");
+      demoValue += (Math.random() - 0.5) * 0.3;
+      return demoValue;
+    }
+  }
+
+  async function poll() {
+    const c = await readTemperature();
+    if (typeof c === "number" &amp;&amp; isFinite(c)) {
+      state.history.push(c);
+      if (state.history.length &gt; HISTORY) state.history.shift();
+      $("updated").textContent = "Updated " + new Date().toLocaleTimeString();
+      render();
+    }
+  }
+
+  function showLed() {
+    $("ledSwitch").classList.toggle("on", state.led);
+    $("ledSwitch").setAttribute("aria-checked", state.led);
+    $("ledState").textContent = state.led ? "On" : "Off";
+  }
+
+  $("ledSwitch").addEventListener("click", async () =&gt; {
+    const previous = state.led;
+    state.led = !state.led;
+    showLed();
+    if (state.demo) return;
+    try {
+      const res = await fetch(API.led, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ on: state.led })
+      });
+      if (!res.ok) throw new Error(res.status);
+    } catch {
+      state.led = previous; // roll back if the device didn't accept it
+      showLed();
+      setStatus(false, "LED update failed");
+    }
+  });
+
+  function wireSegment(id, attr, apply) {
+    const buttons = document.querySelectorAll(`#${id} button`);
+    buttons.forEach(b =&gt; {
+      b.addEventListener("click", () =&gt; {
+        buttons.forEach(x =&gt; x.classList.toggle("on", x === b));
+        apply(b.dataset[attr]);
+        render();
+      });
+    });
+  }
+
+  wireSegment("precision", "p", p =&gt; {
+    state.decimals = +p;
+    localStorage.setItem("decimals", p);
+    if (!state.demo) {
+      fetch(API.precision, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ decimals: +p })
+      }).catch(() =&gt; {});
+    }
+  });
+  wireSegment("units", "u", u =&gt; {
+    state.unit = u;
+    localStorage.setItem("unit", u);
+  });
+
+  // Restore saved preferences
+  document.querySelectorAll("#precision button").forEach(b =&gt; b.classList.toggle("on", +b.dataset.p === state.decimals));
+  document.querySelectorAll("#units button").forEach(b =&gt; b.classList.toggle("on", b.dataset.u === state.unit));
+
+  // Initial LED state from device
+  fetch(API.led, { cache: "no-store" })
+    .then(r =&gt; r.json()).then(d =&gt; { state.led = !!d.on; showLed(); })
+    .catch(() =&gt; {});
+
+  poll();
+  setInterval(poll, POLL_MS);
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="AI C Code">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>AI C Code
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre class="text"><code>    #include "STM32L432KC_SPI.h"
+
+static inline void ds1722_short_delay(void)
+{
+    /* CE setup/hold is ~400 ns; this is comfortably longer at 80 MHz */
+    for (volatile int i = 0; i &lt; 40; i++) { __NOP(); }
+}
+
+static inline void ce_high(void)
+{
+    DS1722_CE_PORT-&gt;BSRR = (1U &lt;&lt; DS1722_CE_PIN);
+    ds1722_short_delay();
+}
+
+static inline void ce_low(void)
+{
+    /* Make sure the last frame has fully left the shift register */
+    while (SPI1-&gt;SR &amp; SPI_SR_BSY) { }
+    ds1722_short_delay();
+    DS1722_CE_PORT-&gt;BRR = (1U &lt;&lt; DS1722_CE_PIN);
+    ds1722_short_delay();
+}
+
+/* Full-duplex 8-bit transfer */
+static uint8_t spi1_transfer(uint8_t tx)
+{
+    while (!(SPI1-&gt;SR &amp; SPI_SR_TXE)) { }
+    /* 8-bit access to DR is required on the L4 to avoid data packing */
+    *(volatile uint8_t *)&amp;SPI1-&gt;DR = tx;
+    while (!(SPI1-&gt;SR &amp; SPI_SR_RXNE)) { }
+    return *(volatile uint8_t *)&amp;SPI1-&gt;DR;
+}
+
+void spi1_init(void)
+{
+    /* Clocks */
+    RCC-&gt;AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN;
+    RCC-&gt;APB2ENR |= RCC_APB2ENR_SPI1EN;
+
+    /* PB3, PB4, PB5 -&gt; alternate function 5 (SPI1) */
+    GPIOB-&gt;MODER &amp;= ~(GPIO_MODER_MODE3 | GPIO_MODER_MODE4 | GPIO_MODER_MODE5);
+    GPIOB-&gt;MODER |=  (2U &lt;&lt; GPIO_MODER_MODE3_Pos) |
+                     (2U &lt;&lt; GPIO_MODER_MODE4_Pos) |
+                     (2U &lt;&lt; GPIO_MODER_MODE5_Pos);
+    GPIOB-&gt;AFR[0] &amp;= ~(GPIO_AFRL_AFSEL3 | GPIO_AFRL_AFSEL4 | GPIO_AFRL_AFSEL5);
+    GPIOB-&gt;AFR[0] |=  (5U &lt;&lt; GPIO_AFRL_AFSEL3_Pos) |
+                      (5U &lt;&lt; GPIO_AFRL_AFSEL4_Pos) |
+                      (5U &lt;&lt; GPIO_AFRL_AFSEL5_Pos);
+    GPIOB-&gt;OSPEEDR |= GPIO_OSPEEDR_OSPEED3 | GPIO_OSPEEDR_OSPEED5;
+
+    /* CE pin -&gt; push-pull output, idle LOW (DS1722 CE is active high) */
+    DS1722_CE_PORT-&gt;MODER &amp;= ~(3U &lt;&lt; (DS1722_CE_PIN * 2U));
+    DS1722_CE_PORT-&gt;MODER |=  (1U &lt;&lt; (DS1722_CE_PIN * 2U));
+    DS1722_CE_PORT-&gt;BRR = (1U &lt;&lt; DS1722_CE_PIN);
+
+    /* SPI1: master, software NSS, CPOL=0, CPHA=1 (SPI mode 1),
+     * MSB first, baud = fPCLK/32 (2.5 MHz at 80 MHz; DS1722 max is 5 MHz) */
+    SPI1-&gt;CR1 = 0;
+    SPI1-&gt;CR1 = SPI_CR1_MSTR | SPI_CR1_SSM | SPI_CR1_SSI |
+                SPI_CR1_CPHA |
+                (4U &lt;&lt; SPI_CR1_BR_Pos);
+
+    /* 8-bit frames, RXNE fires at 8 bits (FRXTH) */
+    SPI1-&gt;CR2 = (7U &lt;&lt; SPI_CR2_DS_Pos) | SPI_CR2_FRXTH;
+
+    SPI1-&gt;CR1 |= SPI_CR1_SPE;
+}
+
+void ds1722_write_config(uint8_t cfg)
+{
+    ce_high();
+    spi1_transfer(DS1722_CFG_WRITE);
+    spi1_transfer(cfg);
+    ce_low();
+}
+
+void ds1722_init(void)
+{
+    ds1722_write_config(DS1722_CFG_12BIT_CONT);
+}
+
+float ds1722_read_temperature(void)
+{
+    uint8_t lsb, msb;
+
+    ce_high();
+    spi1_transfer(DS1722_TEMP_LSB);   /* send address, ignore returned byte */
+    lsb = spi1_transfer(0x00);        /* reg 0x01 */
+    msb = spi1_transfer(0x00);        /* reg 0x02 (auto-increment) */
+    ce_low();
+
+    /* 16-bit two's complement value in units of 1/256 °C */
+    int16_t raw = (int16_t)(((uint16_t)msb &lt;&lt; 8) | lsb);
+    return (float)raw / 256.0f;
+}</code></pre>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/EnzoKatzen\.github\.io\/ENGR-155-Portfolio\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
